@@ -33,7 +33,7 @@ public class EmployeeReactController : BaseController
     [HttpGet]
     public IActionResult Index()
     {
-        _logger.LogInformation("React Employee page accessed at {Time}", DateTime.UtcNow);
+        _logger.LogInformation("React Employee page accessed");
         return View();
     }
 }

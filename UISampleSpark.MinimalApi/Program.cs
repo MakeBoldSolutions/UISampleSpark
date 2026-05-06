@@ -6,6 +6,7 @@ using UISampleSpark.Data.Models;
 using UISampleSpark.Data.Services;
 using UISampleSpark.MinimalApi.Helpers;
 using UISampleSpark.MinimalApi.Middleware;
+using UISampleSpark.MinimalApi.Endpoints;
 using System.Threading.RateLimiting;
 using System.Security.Cryptography;
 using System.Text;
@@ -57,7 +58,10 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<EmployeeContext>(opt => opt.UseInMemoryDatabase("Employee"));
 builder.Services.AddScoped<IEmployeeService, EmployeeDatabaseService>();
 builder.Services.AddScoped<IEmployeeClient, EmployeeDatabaseClient>();
-SeedDatabase.DatabaseInitialization(new EmployeeContext());
+using (var seedContext = new EmployeeContext())
+{
+    SeedDatabase.DatabaseInitialization(seedContext);
+}
 
 string[] configuredApiKeys = builder.Configuration
     .GetSection("ApiSecurity:ApiKeys")
@@ -166,13 +170,3 @@ static bool IsApiKeyAuthorized(HttpRequest request, bool requireApiKey, IReadOnl
         .Any(expected => CryptographicOperations.FixedTimeEquals(provided, expected));
 }
 
-public static class EmployeeGroupEndpoints
-{
-    public static RouteGroupBuilder MapEmployeeApi(this RouteGroupBuilder group, IEmployeeService employeeService)
-    {
-        group.MapGet("/", employeeService.GetEmployeesAsync);
-        group.MapGet("/{id}", employeeService.FindDepartmentByIdAsync);
-        group.MapDelete("/{id}", employeeService.DeleteAsync);
-        return group;
-    }
-}

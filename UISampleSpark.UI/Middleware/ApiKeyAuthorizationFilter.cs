@@ -14,13 +14,25 @@ public sealed class ApiKeyAuthorizationFilter : IAsyncActionFilter
     private const int MaxConfiguredKeys = 10;
     private readonly IConfiguration _configuration;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiKeyAuthorizationFilter"/> class.
+    /// </summary>
+    /// <param name="configuration">Application configuration used to read API key settings.</param>
     public ApiKeyAuthorizationFilter(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Executes the API key authorization check before the action is invoked.
+    /// </summary>
+    /// <param name="context">The action executing context providing request information.</param>
+    /// <param name="next">The delegate to invoke the next action filter or the action itself.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(next);
         bool requireApiKey = _configuration.GetValue("ApiSecurity:RequireApiKey", true);
         if (!requireApiKey)
         {

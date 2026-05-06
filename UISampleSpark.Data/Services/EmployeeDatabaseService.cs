@@ -11,7 +11,7 @@ namespace UISampleSpark.Data.Services;
 /// In production, replace with SQL Server, PostgreSQL, or other persistent provider.
 /// </para>
 /// </remarks>
-public class EmployeeDatabaseService : IEmployeeService
+public partial class EmployeeDatabaseService : IEmployeeService
 {
     private readonly EmployeeContext _context;
     private readonly ILogger<EmployeeDatabaseService> _logger;
@@ -126,7 +126,7 @@ public class EmployeeDatabaseService : IEmployeeService
 
     public async Task<DepartmentDto> FindDepartmentByIdAsync(int Id, CancellationToken token)
     {
-        _logger.LogInformation("Finding department with ID {DepartmentId}", Id);
+        LogFindingDepartment(_logger, Id);
         
         var department = await _context.Departments
             .Where(w => w.Id == Id)
@@ -137,7 +137,7 @@ public class EmployeeDatabaseService : IEmployeeService
         
         if (department == null)
         {
-            _logger.LogWarning("Department with ID {DepartmentId} not found", Id);
+            LogDepartmentNotFound(_logger, Id);
         }
             
         return Create(department);
@@ -145,7 +145,7 @@ public class EmployeeDatabaseService : IEmployeeService
 
     public async Task<EmployeeResponse> FindEmployeeByIdAsync(int Id, CancellationToken token)
     {
-        _logger.LogInformation("Finding employee with ID {EmployeeId}", Id);
+        LogFindingEmployee(_logger, Id);
         
         EmployeeDto? employee = Create(
             await _context.Employees
@@ -157,11 +157,11 @@ public class EmployeeDatabaseService : IEmployeeService
 
         if (employee is null)
         {
-            _logger.LogWarning("Employee with ID {EmployeeId} not found", Id);
+            LogEmployeeNotFound(_logger, Id);
             return new EmployeeResponse("Employee Not Found");
         }
         
-        _logger.LogDebug("Employee {EmployeeId} found: {EmployeeName}", Id, employee.Name);
+        LogEmployeeFound(_logger, Id, employee.Name);
         return new EmployeeResponse(employee);
     }
 
@@ -350,4 +350,19 @@ public class EmployeeDatabaseService : IEmployeeService
 
         return await SaveAsync(employee, token);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Finding department with ID {DepartmentId}")]
+    private static partial void LogFindingDepartment(ILogger logger, int departmentId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Department with ID {DepartmentId} not found")]
+    private static partial void LogDepartmentNotFound(ILogger logger, int departmentId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Finding employee with ID {EmployeeId}")]
+    private static partial void LogFindingEmployee(ILogger logger, int employeeId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Employee with ID {EmployeeId} not found")]
+    private static partial void LogEmployeeNotFound(ILogger logger, int employeeId);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Employee {EmployeeId} found: {EmployeeName}")]
+    private static partial void LogEmployeeFound(ILogger logger, int employeeId, string employeeName);
 }

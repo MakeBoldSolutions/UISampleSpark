@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace UISampleSpark.Data.Tests.Repository;
 
 [TestClass]
-public class EmployeeDBTests : IDisposable
+public sealed class EmployeeDBTests : IDisposable
 {
     private EmployeeDB? employeeDB;
     private EmployeeContext? context;

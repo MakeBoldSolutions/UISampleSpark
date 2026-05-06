@@ -10,7 +10,7 @@ public class EmployeeDtoTests
     public void emp_IsValidFalse_Age()
     {
         // Arrange
-        EmployeeDto emp = GetValidEmployee();
+        EmployeeDto emp = GetValidEmployee;
         emp.Age = 0;
 
         // Assert
@@ -22,7 +22,7 @@ public class EmployeeDtoTests
     public void emp_IsValidFalse_Country()
     {
         // Arrange
-        EmployeeDto emp = GetValidEmployee();
+        EmployeeDto emp = GetValidEmployee;
         emp.Country = string.Empty;
 
         // Assert
@@ -34,7 +34,7 @@ public class EmployeeDtoTests
     public void emp_IsValidFalse_Department()
     {
         // Arrange
-        EmployeeDto emp = GetValidEmployee();
+        EmployeeDto emp = GetValidEmployee;
         emp.Department = EmployeeDepartmentEnum.Unknown;
 
         // Assert
@@ -46,7 +46,7 @@ public class EmployeeDtoTests
     public void emp_IsValidFalse_Name()
     {
         // Arrange
-        EmployeeDto emp = GetValidEmployee();
+        EmployeeDto emp = GetValidEmployee;
         emp.Name = string.Empty;
 
         // Assert
@@ -58,7 +58,7 @@ public class EmployeeDtoTests
     public void emp_IsValidFalse_State()
     {
         // Arrange
-        EmployeeDto emp = GetValidEmployee();
+        EmployeeDto emp = GetValidEmployee;
         emp.State = string.Empty;
 
         // Assert
@@ -70,7 +70,7 @@ public class EmployeeDtoTests
     public void emp_Validate()
     {
         // Arrange
-        EmployeeDto emp = GetValidEmployee();
+        EmployeeDto emp = GetValidEmployee;
 
         // Assert - Using Assert.Multiple for better reporting
         Assert.IsNotNull(emp, "Employee should not be null");
@@ -180,16 +180,13 @@ public class EmployeeDtoTests
         // Assert
         Assert.IsTrue(isValid, "Employee with valid data should be valid");
     }
-    public static EmployeeDto GetValidEmployee()
-    {
-        return new EmployeeDto(
-                    999,
-                    "Name",
-                    20,
-                    "State",
-                    "Country",
-                    EmployeeDepartmentEnum.Marketing);
-    }
+    public static EmployeeDto GetValidEmployee => new EmployeeDto(
+                999,
+                "Name",
+                20,
+                "State",
+                "Country",
+                EmployeeDepartmentEnum.Marketing);
 
 
     [TestMethod]

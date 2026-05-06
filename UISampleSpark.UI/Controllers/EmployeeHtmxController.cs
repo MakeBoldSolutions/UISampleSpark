@@ -37,7 +37,7 @@ public class EmployeeHtmxController : BaseController
     [HttpGet]
     public IActionResult Index()
     {
-        _logger.LogInformation("htmx Employee page accessed at {Time}", DateTime.UtcNow);
+        _logger.LogInformation("htmx Employee page accessed");
         return View();
     }
 

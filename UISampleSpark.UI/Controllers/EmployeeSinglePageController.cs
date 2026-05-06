@@ -34,7 +34,7 @@ namespace UISampleSpark.UI.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            _logger.LogInformation("SPA Employee page accessed at {Time}", DateTime.UtcNow);
+            _logger.LogInformation("SPA Employee page accessed");
             return View();
         }
     }

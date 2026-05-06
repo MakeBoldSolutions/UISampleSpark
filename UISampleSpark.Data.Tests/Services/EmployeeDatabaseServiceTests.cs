@@ -11,7 +11,7 @@ namespace UISampleSpark.Data.Tests.Services;
 /// 
 /// </summary>
 [TestClass]
-public class EmployeeDatabaseServiceTests : IDisposable
+public sealed class EmployeeDatabaseServiceTests : IDisposable
 {
     private readonly CancellationToken ct;
     private IEmployeeService? employeeService;

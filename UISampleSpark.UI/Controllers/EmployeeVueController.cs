@@ -33,7 +33,7 @@ public class EmployeeVueController : BaseController
     [HttpGet]
     public IActionResult Index()
     {
-        _logger.LogInformation("Vue Employee page accessed at {Time}", DateTime.UtcNow);
+        _logger.LogInformation("Vue Employee page accessed");
         return View();
     }
 }

@@ -33,7 +33,7 @@ public class EmployeeBlazorController : BaseController
     [HttpGet]
     public IActionResult Index()
     {
-        _logger.LogInformation("Blazor Employee page accessed at {Time}", DateTime.UtcNow);
+        _logger.LogInformation("Blazor Employee page accessed");
         return View();
     }
 }

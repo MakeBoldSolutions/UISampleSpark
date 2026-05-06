@@ -8,7 +8,7 @@ namespace UISampleSpark.Data.Services;
 /// that adds structured logging for all operations. Follows the repository pattern
 /// to abstract data access from consumers.
 /// </remarks>
-public class EmployeeDatabaseClient : IEmployeeClient
+public partial class EmployeeDatabaseClient : IEmployeeClient
 {
     private readonly IEmployeeService service;
     private readonly ILogger<EmployeeDatabaseClient> _logger;
@@ -31,7 +31,7 @@ public class EmployeeDatabaseClient : IEmployeeClient
 
     public async Task<EmployeeResponse> DeleteAsync(int id, CancellationToken token)
     {
-        _logger.LogInformation("Client: Deleting employee with ID {EmployeeId}", id);
+        LogDeletingEmployee(_logger, id);
         return await service.DeleteAsync(id, token).ConfigureAwait(false);
     }
 
@@ -42,7 +42,7 @@ public class EmployeeDatabaseClient : IEmployeeClient
 
     public async Task<EmployeeResponse> FindEmployeeByIdAsync(int id, CancellationToken token)
     {
-        _logger.LogInformation("Client: Finding employee with ID {EmployeeId}", id);
+        LogFindingEmployee(_logger, id);
         return await service.FindEmployeeByIdAsync(id, token).ConfigureAwait(false);
     }
 
@@ -70,4 +70,10 @@ public class EmployeeDatabaseClient : IEmployeeClient
     {
         return await service.UpdateAsync(id, employee, token).ConfigureAwait(false);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Client: Deleting employee with ID {EmployeeId}")]
+    private static partial void LogDeletingEmployee(ILogger logger, int employeeId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Client: Finding employee with ID {EmployeeId}")]
+    private static partial void LogFindingEmployee(ILogger logger, int employeeId);
 }
