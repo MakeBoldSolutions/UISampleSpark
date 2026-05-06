@@ -1,0 +1,25 @@
+id: create-spec
+name: Create Spec
+description: >
+  Orchestrate specify -> plan -> generate-tasks -> analyze for a new feature.
+  Pauses after the analyze gate so a human can review findings before any
+  implementation begins.
+output_type: reviewable-artifact
+autonomy:
+  level: assisted
+  review_after:
+    - analyze
+steps:
+  - id: specify
+    prompt: specify
+    on_failure: abort
+  - id: plan
+    prompt: plan
+    on_failure: abort
+  - id: generate-tasks
+    prompt: tasks
+    on_failure: abort
+  - id: analyze
+    prompt: analyze
+    pause_after: true
+    on_failure: pause

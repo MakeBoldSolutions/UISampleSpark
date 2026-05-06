@@ -8,9 +8,6 @@ handoffs:
     agent: devspark.clarify
     prompt: Clarify specification requirements
     send: true
-scripts:
-  sh: .devspark/scripts/bash/create-new-feature.sh --json "{ARGS}"
-  ps: .devspark/scripts/powershell/create-new-feature.ps1 -Json "{ARGS}"
 ---
 
 ## User Input
@@ -46,7 +43,7 @@ This workflow MUST also validate the document against the shared specification v
 
 ## Outline
 
-The text the user typed after `/devspark.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/devspark.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 **Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
 
@@ -90,12 +87,12 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
 
-   > **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+   > **Script Resolution**: Before running `.devspark/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS"`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-   d. Run the script `{SCRIPT}` with the calculated number and short-name:
+   d. Run the script `.devspark/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS"` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `{SCRIPT} --json --number 5 --short-name "user-auth" "Add user authentication"`
-      - PowerShell example: `{SCRIPT} -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
+      - Bash example: `.devspark/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS" --json --number 5 --short-name "user-auth" "Add user authentication"`
+      - PowerShell example: `.devspark/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
 
    **IMPORTANT**:
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number

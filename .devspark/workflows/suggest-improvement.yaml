@@ -1,0 +1,27 @@
+id: suggest-improvement
+name: Suggest Improvement
+description: >
+  Capture context, classify the proposed improvement, file an issue in
+  markhazleton/devspark, and (optionally) assign a coding agent and
+  trigger an implementation pass.
+output_type: issue-link
+autonomy:
+  level: assisted
+steps:
+  - id: capture-context
+    prompt: capture-context
+    on_failure: abort
+  - id: classify-improvement
+    prompt: classify-improvement
+    on_failure: abort
+  - id: create-issue
+    prompt: create-issue
+    on_failure: abort
+  - id: assign-agent
+    prompt: assign-agent
+    when: context.assign_agent == true
+    on_failure: continue
+  - id: implement
+    prompt: implement
+    when: context.assign_agent == true
+    on_failure: pause

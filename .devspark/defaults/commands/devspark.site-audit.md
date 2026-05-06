@@ -5,9 +5,6 @@ handoffs:
   - label: View Audit History
     agent: devspark.site-audit
     prompt: Show me previous audit reports in .documentation/copilot/audit/
-scripts:
-  sh: .devspark/scripts/bash/site-audit.sh $ARGUMENTS --json
-  ps: .devspark/scripts/powershell/site-audit.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -52,9 +49,9 @@ If no scope specified, default to `--scope=full`.
 
 ### 1. Initialize Audit Context
 
-> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+> **Script Resolution**: Before running `.devspark/scripts/powershell/site-audit.ps1 $ARGUMENTS -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-Run `{SCRIPT}` to gather codebase data and parse JSON output for:
+Run `.devspark/scripts/powershell/site-audit.ps1 $ARGUMENTS -Json` to gather codebase data and parse JSON output for:
 - `REPO_ROOT`: Repository root path
 - `CONSTITUTION_PATH`: Path to constitution file
 - `FILES`: Categorized file listings
@@ -136,7 +133,7 @@ Read the most recent `## [X.Y.Z]` entry in `CHANGELOG.md` (repo root) to get
 |-----------|-----------|---------|
 | `.devspark/VERSION` absent and legacy stamp absent | VER1 | HIGH |
 | Installed version < latest version | VER2 | MEDIUM |
-| Agent command files reference `.specify/` or root `memory/`, `scripts/`, `templates/`, or `specs/` paths | VER3 | HIGH |
+| Agent command files reference `.documentation/` or root `memory/`, `scripts/`, `templates/`, or `specs/` paths | VER3 | HIGH |
 | Root-level `memory/`, `scripts/`, `templates/`, or `specs/` directories exist | VER4 | HIGH |
 | Old `devspark.*-old.md` files in agent folder | VER5 | LOW |
 

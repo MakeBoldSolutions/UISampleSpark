@@ -1,0 +1,3 @@
+id: suggest-improvement
+description: Capture context, classify, and file an improvement issue in markhazleton/devspark
+target_workflow: suggest-improvement

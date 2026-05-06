@@ -1,0 +1,21 @@
+id: execute-plan
+name: Execute Plan
+description: >
+  Run implement -> create-pr -> review-pr with a mandatory pause after
+  create-pr in assisted mode so a human can confirm the PR before review.
+output_type: pull-request
+autonomy:
+  level: assisted
+  review_after:
+    - create-pr
+steps:
+  - id: implement
+    prompt: implement
+    on_failure: abort
+  - id: create-pr
+    prompt: create-pr
+    pause_after: true
+    on_failure: pause
+  - id: review-pr
+    prompt: pr-review
+    on_failure: abort

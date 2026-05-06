@@ -379,4 +379,4 @@ If user says "done" before any questions:
 
 ## Context
 
-{ARGS}
+$ARGUMENTS

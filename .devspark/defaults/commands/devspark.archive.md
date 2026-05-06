@@ -7,9 +7,6 @@ handoffs:
   - label: Run Documentation Audit
     agent: devspark.site-audit
     prompt: Audit documentation quality and stale references before harvest
-scripts:
-  sh: .devspark/scripts/bash/harvest.sh $ARGUMENTS --json
-  ps: .devspark/scripts/powershell/harvest.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -39,9 +36,9 @@ Treat every invocation of `/devspark.archive` as an invocation of `/devspark.har
 
 ### 1. Gather Context
 
-> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+> **Script Resolution**: Before running `.devspark/scripts/powershell/harvest.ps1 $ARGUMENTS -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-Run `{SCRIPT}` from the repo root. Parse the JSON output:
+Run `.devspark/scripts/powershell/harvest.ps1 $ARGUMENTS -Json` from the repo root. Parse the JSON output:
 
 - `REPO_ROOT` — absolute path to the repository root
 - `ARCHIVE_DIR` — target folder for today's archive (e.g., `.archive/2026-03-07`)

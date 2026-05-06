@@ -7,9 +7,6 @@ handoffs:
   - label: Upgrade to Full Spec
     agent: devspark.specify
     prompt: Create a full specification for this change
-scripts:
-  sh: .devspark/scripts/bash/quickfix-context.sh $ARGUMENTS --json
-  ps: .devspark/scripts/powershell/quickfix-context.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -57,9 +54,9 @@ Parse `$ARGUMENTS` for action type:
 
 ### 1. Initialize Quickfix Context
 
-> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+> **Script Resolution**: Before running `.devspark/scripts/powershell/quickfix-context.ps1 $ARGUMENTS -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-Run `{SCRIPT}` to gather context and parse JSON output for:
+Run `.devspark/scripts/powershell/quickfix-context.ps1 $ARGUMENTS -Json` to gather context and parse JSON output for:
 
 - `REPO_ROOT`: Repository root path
 - `CONSTITUTION_PATH`: Path to constitution file

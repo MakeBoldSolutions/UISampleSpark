@@ -7,9 +7,6 @@ handoffs:
   - label: Create New PR
     agent: devspark.create-pr
     prompt: Create a new pull request for this branch
-scripts:
-  sh: .devspark/scripts/bash/get-pr-context.sh $ARGUMENTS --json
-  ps: .devspark/scripts/powershell/get-pr-context.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -48,9 +45,9 @@ This command updates an **existing** pull request description based on the curre
 
 ### 1. Initialize PR Context
 
-> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+> **Script Resolution**: Before running `.devspark/scripts/powershell/get-pr-context.ps1 $ARGUMENTS -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-Run `{SCRIPT}` and parse its JSON output for:
+Run `.devspark/scripts/powershell/get-pr-context.ps1 $ARGUMENTS -Json` and parse its JSON output for:
 
 - `PR_CONTEXT`: Current PR metadata (number, title, branches, commit SHA, files, diff)
 - `CONSTITUTION_PATH`: Path to constitution file

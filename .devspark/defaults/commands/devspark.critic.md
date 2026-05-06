@@ -9,9 +9,6 @@ handoffs:
     agent: devspark.tasks
     prompt: Regenerate tasks with missing operational items
     send: true
-scripts:
-  sh: .devspark/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
-  ps: .devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
 ---
 
 ## User Input
@@ -47,9 +44,9 @@ Read the YAML frontmatter in `spec.md` before evaluating risk. Treat `classifica
 
 ### 1. Initialize Analysis Context
 
-> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+> **Script Resolution**: Before running `.devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
+Run `.devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
 
 - SPEC = FEATURE_DIR/spec.md
 - PLAN = FEATURE_DIR/plan.md
@@ -494,7 +491,7 @@ This command produces a **"pre-mortem"** analysis - imagining the project has fa
 
 ## Context
 
-{ARGS}
+$ARGUMENTS
 
 ## Shared Review Resolution Contract Output
 

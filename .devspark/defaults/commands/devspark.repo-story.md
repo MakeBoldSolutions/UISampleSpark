@@ -4,9 +4,6 @@ handoffs:
   - label: View Past Stories
     agent: devspark.repo-story
     prompt: Show me previous repo stories in .documentation/repo-story/
-scripts:
-  sh: .devspark/scripts/bash/repo-story-context.sh $ARGUMENTS --stdout
-  ps: .devspark/scripts/powershell/repo-story-context.ps1 $ARGUMENTS -Stdout
 ---
 
 ## User Input
@@ -50,9 +47,9 @@ If no scope specified, default to `--scope=full`.
 
 ### 1. Generate History Context
 
-> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+> **Script Resolution**: Before running `.devspark/scripts/powershell/repo-story-context.ps1 $ARGUMENTS -Stdout`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
-Run `{SCRIPT}` to produce `history.json` and parse the JSON output for these top-level sections:
+Run `.devspark/scripts/powershell/repo-story-context.ps1 $ARGUMENTS -Stdout` to produce `history.json` and parse the JSON output for these top-level sections:
 
 - `audit_parameters` — time window, scope, anonymization settings
 - `repo` — repository name, remote URL, default branch

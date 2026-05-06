@@ -275,7 +275,7 @@ Offer to show diffs for any changed files so the team can decide what to merge.
 
 **Legacy migration collision guidance:**
 
-- If legacy `.specify/`, root `scripts/`, root `templates/`, or root `specs/` content is migrated and an equivalent file already exists under `.documentation/`, keep the existing `.documentation/` file.
+- If legacy `.documentation/`, root `scripts/`, root `templates/`, or root `specs/` content is migrated and an equivalent file already exists under `.documentation/`, keep the existing `.documentation/` file.
 - Report the skipped legacy file and preserve it in the corresponding `.old/` backup for manual review.
 - Never silently replace active `.documentation/` overrides with legacy content during upgrade.
 
