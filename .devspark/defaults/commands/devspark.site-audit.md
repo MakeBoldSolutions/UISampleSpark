@@ -42,6 +42,7 @@ Parse `$ARGUMENTS` for scope flags:
 | `--scope=quality` | Code quality metrics only |
 | `--scope=unused` | Unused code/dependencies detection |
 | `--scope=duplicate` | Duplicate code detection |
+| `--scope=comments` | Stale comments and spec references only |
 
 If no scope specified, default to `--scope=full`.
 
@@ -50,6 +51,8 @@ If no scope specified, default to `--scope=full`.
 **Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
 
 ### 1. Initialize Audit Context
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 Run `{SCRIPT}` to gather codebase data and parse JSON output for:
 - `REPO_ROOT`: Repository root path
@@ -288,7 +291,81 @@ Calculate and report:
 - Commented-out code blocks
 - Inconsistent formatting patterns
 
-### 9. Unused Code Detection
+### 9. Stale Comments and Spec References Audit
+
+Scan source files for code comments that have lost their value or reference completed work.
+
+#### A. Completed Spec References
+
+Search for comments that reference specs, phases, or tasks that are now complete:
+
+```text
+# spec 026
+# FR-013
+# T006
+# Phase 5
+# TODO(spec-018)
+# See spec-032
+```
+
+For each match:
+- Verify whether the referenced spec/task is actually complete (check `/.documentation/specs/`)
+- Flag as stale if the spec is archived or marked `Complete`
+- Include file:line and the matched comment in the finding
+
+#### B. Old-Behavior Comments
+
+Detect comments that describe behavior that no longer matches the code:
+
+- Comments with past tense ("previously", "used to", "was changed in")
+- Comments referencing removed functions, classes, or variables that no longer exist in the file
+- Inline explanations that contradict the current logic in the same block
+
+#### C. Commented-Out Code Blocks
+
+Flag commented-out code blocks exceeding 3 consecutive lines. These accumulate technical debt and should either be deleted in a dedicated commit or restored as active code — use `git blame` to understand the original intent before removing.
+
+#### D. Version Migration Comments
+
+Flag comments of the form "Added in v2.8.0", "Deprecated since v3.0", "TODO: remove after upgrade" when the referenced version is already past. These provide no value over `git blame` and clutter the codebase.
+
+#### False-Positive Suppression Policy
+
+Before flagging any finding in sections 9–11, apply these suppression rules to avoid false positives:
+
+**DO NOT flag**:
+
+1. **Unused imports that are re-exports**: If an import appears in an `__init__.py` or barrel file (e.g., `index.ts`) and is explicitly re-exported with `__all__`, `export`, or a wildcard, suppress the "unused import" finding.
+
+2. **Dead code reachable via dynamic dispatch**: If a function or class appears uncalled but the file registers plugins, uses `getattr`, metaclasses, `importlib`, or decorator-based registries, do not flag it as dead code. Note the dynamic dispatch pattern instead.
+
+3. **Test-only utilities appearing unused from production**: Functions in `test*/`, `conftest.py`, `fixtures/`, or `*_helpers.py` that have no callers in the production source tree are not dead code — they serve test infrastructure. Only flag if the file has no test callers either.
+
+Include findings from this phase in the audit report under **Stale Code Comments**:
+
+```markdown
+## Stale Code Comments
+
+### Completed Spec References
+
+| ID | File:Line | Comment | Referenced Spec Status | Action |
+|----|-----------|---------|----------------------|--------|
+| CMT1 | src/handler.py:45 | `# spec 026` | Archived | Remove comment |
+
+### Commented-Out Code Blocks
+
+| ID | File:Lines | Size | Action |
+|----|-----------|------|--------|
+| CMT2 | src/utils.py:89-95 | 7 lines | Delete or restore |
+
+### Version Migration Comments
+
+| ID | File:Line | Comment | Action |
+|----|-----------|---------|--------|
+| CMT3 | src/api.py:12 | `# Added in v2.0` | Remove — no value over git blame |
+```
+
+### 10. Unused Code Detection
 
 Scan for potentially unused:
 
@@ -297,6 +374,8 @@ Scan for potentially unused:
 - Classes never instantiated
 - Variables assigned but never read
 - Imports never used
+
+Apply the false-positive suppression policy from section 9 before flagging any unused code.
 
 #### Dead Files
 - Source files not imported anywhere
@@ -307,7 +386,7 @@ Scan for potentially unused:
 - Packages in requirements but never imported
 - DevDependencies in package.json unused
 
-### 10. Duplicate Code Detection
+### 11. Duplicate Code Detection
 
 Identify copy-paste patterns:
 
@@ -322,7 +401,7 @@ For each duplicate:
 - Similarity percentage
 - Suggested consolidation approach
 
-### 11. Severity Classification
+### 12. Severity Classification
 
 Apply consistent severity across all findings:
 
@@ -333,7 +412,7 @@ Apply consistent severity across all findings:
 | **MEDIUM** | Code quality concern, maintainability issue, missing tests |
 | **LOW** | Style suggestion, minor improvement, optimization opportunity |
 
-### 12. Generate Audit Report
+### 13. Generate Audit Report
 
 Create comprehensive report at `/.documentation/copilot/audit/YYYY-MM-DD_results.md`:
 

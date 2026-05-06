@@ -1,15 +1,15 @@
 ---
-description: Archive outdated documentation to .archive/, update Guide.md and CHANGELOG.md so .documentation stays current and clean
+description: Deprecated compatibility alias for /devspark.harvest
 handoffs:
-  - label: Run a site audit after archiving
+  - label: Review Release Artifacts
+    agent: devspark.release
+    prompt: Review completed specs and release documentation before archival
+  - label: Run Documentation Audit
     agent: devspark.site-audit
-    prompt: Run a site audit to confirm the project is in good health after archiving
-  - label: Evolve the constitution
-    agent: devspark.evolve-constitution
-    prompt: Review the constitution in light of the cleaned-up documentation
+    prompt: Audit documentation quality and stale references before harvest
 scripts:
-  sh: .devspark/scripts/bash/archive-context.sh --json
-  ps: .devspark/scripts/powershell/archive-context.ps1 -Json
+  sh: .devspark/scripts/bash/harvest.sh $ARGUMENTS --json
+  ps: .devspark/scripts/powershell/harvest.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -18,22 +18,28 @@ scripts:
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty). If the user names specific files or directories, prioritize those as archive candidates.
+This command is deprecated and exists only for backward compatibility.
 
-## Purpose
+Treat every invocation of `/devspark.archive` as an invocation of `/devspark.harvest`, preserving all user arguments.
 
-Keep `.documentation/` current and authoritative. Move outdated, completed, or contradicting material to `.archive/` with a date-stamped folder. Before moving anything, extract important information into `CHANGELOG.md` and `.documentation/Guide.md` so no knowledge is lost.
+## Required Behavior
 
-**CRITICAL: Never read from `.archive/` during this command or any other command.** The archive folder is write-only from an operational perspective. Past decisions are preserved for audit; they do not drive current work.
+1. Follow the `/devspark.harvest` workflow exactly.
+2. Use harvest terminology in plans and summaries.
+3. If helpful, mention once that `/devspark.archive` is deprecated and that `/devspark.harvest` is the canonical command going forward.
+4. Do not present archive as a separate lifecycle workflow.
 
-## Prerequisites
+## Notes
 
-- Git repository (recommended but not required)
-- `.documentation/` directory exists
+- The compatibility alias remains so existing repos, docs, and user habits do not break immediately.
+- Any long-term documentation or examples should point to `/devspark.harvest` instead.
+- Deprecated compatibility wrappers such as `archive-context` may still exist during the migration window.
 
-## Execution Steps
+## Outline
 
 ### 1. Gather Context
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 Run `{SCRIPT}` from the repo root. Parse the JSON output:
 
@@ -144,7 +150,7 @@ Do not add historical content to Guide.md — it describes the present, not the 
 4. If moving a directory would leave an empty parent, remove the empty parent only if it has no remaining files.
 5. **Do not move** `.documentation/memory/constitution.md` — it is never an archive candidate.
 6. **Do not move** `.devspark/scripts/` (stock scripts) or `.documentation/scripts/` (team script overrides) — these are operational.
-7. **Do not move** `.documentation/templates/` — these are operational.
+7. **Do not move** `.devspark/templates/` — these are operational.
 
 ### 7. Update .archive/README.md
 
@@ -187,7 +193,7 @@ Output a summary to the user:
 Brief description of what remains and why it is all current.
 ```
 
-## Rules
+## Constraints
 
 - **Never read `.archive/` in this or any other command.**
 - **Never archive `.documentation/memory/constitution.md`.**

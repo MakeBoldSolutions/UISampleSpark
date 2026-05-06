@@ -211,10 +211,10 @@ function Test-DirHasFiles {
 }
 
 # ---------------------------------------------------------------------------
-# Multi-app support helpers (T010, T015, T023, T027, T029)
+# Multi-app support helpers
 # ---------------------------------------------------------------------------
 
-# Detect multi-app or single-app mode (T015)
+# Detect whether the repository is operating in multi-app mode.
 function Detect-DevSparkMode {
     $repoRoot = Get-RepoRoot
     $registryPath = Join-Path $repoRoot '.documentation/devspark.json'
@@ -232,7 +232,7 @@ function Detect-DevSparkMode {
     return 'single-app'
 }
 
-# Validate registry basics using ConvertFrom-Json (T010)
+# Validate the registry structure before deeper processing.
 function Test-RegistryJson {
     param([string]$RegistryPath)
 

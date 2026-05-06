@@ -41,9 +41,9 @@ Follow this execution flow:
    - Ensure Governance section lists amendment procedure, versioning policy, and compliance review expectations.
 
 4. Consistency propagation checklist (convert prior checklist into active validations):
-   - Read `/.documentation/templates/plan-template.md` (or `templates/plan-template.md` in source repos) and ensure any "Constitution Check" or rules align with updated principles.
-   - Read `/.documentation/templates/spec-template.md` (or `templates/spec-template.md` in source repos) for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
-   - Read `/.documentation/templates/tasks-template.md` (or `templates/tasks-template.md` in source repos) and ensure task categorization reflects new or removed principle-driven task types (e.g., observability, versioning, testing discipline).
+   - Read `/.devspark/templates/plan-template.md` (or `templates/plan-template.md` in source repos) and ensure any "Constitution Check" or rules align with updated principles.
+   - Read `/.devspark/templates/spec-template.md` (or `templates/spec-template.md` in source repos) for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
+   - Read `/.devspark/templates/tasks-template.md` (or `templates/tasks-template.md` in source repos) and ensure task categorization reflects new or removed principle-driven task types (e.g., observability, versioning, testing discipline).
    - Read command prompt templates from `templates/commands/*.md` when available; otherwise inspect generated command files under active agent folders (for example `.github/agents/`, `.claude/commands/`, `.cursor/commands/`, `.gemini/commands/`). Verify no outdated references (agent-specific names like CLAUDE only) remain when generic guidance is required.
    - Read runtime guidance docs (for example `README.md`, `/.documentation/Guide.md`, and agent-specific guidance files if present). Update references to principles changed.
 

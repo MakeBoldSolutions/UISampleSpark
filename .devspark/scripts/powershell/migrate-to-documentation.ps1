@@ -1,5 +1,5 @@
 # migrate-to-documentation.ps1
-# Migrates Spec Kit projects from old structure (.specify/, memory/, scripts/, templates/)
+# Migrates DevSpark projects from old structure (.specify/, memory/, scripts/, templates/)
 # to new .documentation/ structure
 #
 # Usage:
@@ -125,7 +125,7 @@ if ($DryRun) {
     Write-ColorOutput "DRY RUN MODE - No files will be modified" "Cyan"
     Write-ColorOutput "============================================" "Blue"
 } else {
-    Write-ColorOutput "Spec Kit Migration to .documentation/" "Blue"
+    Write-ColorOutput "DevSpark Migration to .documentation/" "Blue"
     Write-ColorOutput "============================================" "Blue"
 }
 Write-Host ""
@@ -474,7 +474,7 @@ if (Test-Path ".gitignore") {
         if ($DryRun) {
             Print-DryRun "Would add .documentation/_site/ to .gitignore"
         } else {
-            Add-Content -Path ".gitignore" -Value "`n# Spec Kit documentation build output`n.documentation/_site/"
+            Add-Content -Path ".gitignore" -Value "`n# DevSpark documentation build output`n.documentation/_site/"
             Print-Status "Added .documentation/_site/ to .gitignore"
         }
     } else {
@@ -539,5 +539,5 @@ if ($script:WarningsCount -gt 0) {
 if (-not $DryRun) {
     Print-Status "Migration script completed successfully"
     Write-Host ""
-    Write-ColorOutput "Need help? See .documentation\migration-guide.md" "Cyan"
+    Write-ColorOutput "Need help? See .documentation\upgrade.md" "Cyan"
 }

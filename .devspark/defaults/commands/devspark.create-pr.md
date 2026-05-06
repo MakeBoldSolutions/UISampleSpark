@@ -1,5 +1,9 @@
 ---
 description: Draft or update a spec-aware pull request with task, checklist, and gate visibility before review.
+handoffs:
+  - label: Review Pull Request
+    agent: devspark.pr-review
+    prompt: Review the pull request for constitution compliance
 scripts:
   sh: .devspark/scripts/bash/create-pr.sh --mode preflight --json $ARGUMENTS
   ps: .devspark/scripts/powershell/create-pr.ps1 -Mode Preflight -Json $ARGUMENTS
@@ -29,24 +33,24 @@ This command is advisory. Dirty trees, missing specs, incomplete tasks, unresolv
 
 ## Outline
 
+**Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
+
 ### 1. Run Preflight Context
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 Run `{SCRIPT}` once from the repository root and parse the returned JSON.
 
 Use the script output as the source of truth for:
 
-- current branch
-- target branch
-- dirty tree status
-- authentication status
-- existing PR detection
-- spec detection
-- task completion counts
-- checklist completion summary
-- gate artifact scan results
-- gate summaries and severities
-- explicit gate acknowledgements captured in tasks or quickfix records
-- diff stats and recent commit subjects
+- current branch, target branch, dirty tree status, and push status
+- authentication status and creation support
+- existing PR (number, URL, title, state, draft flag)
+- spec and quickfix detection (paths, classification, risk, required gates)
+- task completion counts and checklist summaries
+- gate artifact scan results and severities
+- gate acknowledgements from tasks or quickfix records
+- `diff.lines_summary`, `diff.commit_log` (hash/subject/author/date), `diff.file_changes` (status/path)
 
 If auth is unavailable or the platform does not support automated PR creation, report that clearly and stop before any create/update action.
 
@@ -63,47 +67,21 @@ Present any relevant warnings before drafting the PR:
 - explicit gate acknowledgements already recorded in tasks or quickfix artifacts
 - no gate artifacts found
 
-Use recommendation language, not hard-block language. Example:
-
-> "3 of 8 tasks are incomplete. I recommend either finishing them first or creating the PR as a draft."
+Use recommendation language, not hard-block language.
 
 ### 3. Draft the PR Title and Description
 
-Derive the title in this order:
+Derive the title: spec title → branch name → most recent `diff.commit_log` subject.
 
-1. spec title
-2. branch name
-3. recent commit subjects
+Build the body from the preflight JSON (keep total under 4,000 characters):
 
-Draft the body using this structure:
-
-```markdown
-## Summary
-{From spec intent/summary, or inferred from commits if no spec}
-
-## Changes
-{From diff stats and changed file analysis}
-
-## Task Completion
-{N/M tasks complete, plus checklist summary if present}
-
-## Quality Gates
-{Gate summary, or "No gate artifacts found"}
-
-## Gate Acknowledgements
-{Explicit user decisions to proceed despite unresolved findings, if any}
-
-## Spec Reference
-{Path to spec directory or N/A}
-
-## Quickfix Reference
-{Path to quickfix record or N/A}
-
-## Notes
-{Warnings, reviewer hints, or user-supplied notes}
-```
-
-Keep the draft concise and under 4,000 characters.
+- **Summary** — spec intent/summary, quickfix problem statement, or inferred from `diff.commit_log` subjects
+- **Changes** — file list from `diff.file_changes` (status + path) and `diff.lines_summary`
+- **Task Completion** — `N/M tasks complete`; checklist summary if present
+- **Quality Gates** — gate artifact statuses, or "No gate artifacts found"
+- **Gate Acknowledgements** — explicit decisions to proceed (omit section if none)
+- **Spec/Quickfix Reference** — path to spec or quickfix record, or N/A
+- **Notes** — warnings, reviewer hints, user-supplied notes
 
 ### 4. Ask for Explicit Confirmation
 
@@ -148,9 +126,9 @@ After creation or update, report:
 - whether it is draft or ready for review
 - any warnings that still remain unresolved
 
-## Notes
+## Guidelines
 
-- Branches with no spec are valid. If a quickfix record exists for the current branch, use it before falling back to branch name, diff stats, and commit subjects.
+- Branches with no spec are valid. Use a quickfix record if found; otherwise derive context from `diff.commit_log` and branch name.
 - If task or checklist artifacts are missing, report that plainly and continue with a lighter draft.
 - If gate artifacts are absent, recommend `/devspark.analyze` or `/devspark.critic` before merge.
-- If gate acknowledgements exist, surface them plainly in the draft instead of burying them in prose.
+- Surface gate acknowledgements plainly in the draft body rather than burying them in prose.

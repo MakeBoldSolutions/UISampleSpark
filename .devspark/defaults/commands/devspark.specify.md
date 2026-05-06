@@ -42,6 +42,8 @@ recommended_next_step: plan | clarify | implement
 required_gates: checklist | checklist, analyze, critic
 ```
 
+This workflow MUST also validate the document against the shared specification validation contract in `/.devspark/templates/spec-validation-contract.md` for installed repos, or `templates/spec-validation-contract.md` in source repos.
+
 ## Outline
 
 The text the user typed after `/devspark.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
@@ -56,6 +58,7 @@ Given that feature description, do this:
    - Present the recommendation and reasoning to the user
    - Ask the user to confirm or override the route before creating artifacts
    - If the confirmed route is `one-off-fix`, stop and instruct the user to run `/devspark.quickfix` unless they explicitly want to continue here
+   - If `/.documentation/memory/constitution.md` exists, load it so the generated spec can reference mandatory principles and constraints
 
 1. **Generate a concise short name** (2-4 words) for the branch:
    - Analyze the feature description and extract the most meaningful keywords
@@ -87,6 +90,8 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
 
+   > **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+
    d. Run the script `{SCRIPT}` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
       - Bash example: `{SCRIPT} --json --number 5 --short-name "user-auth" "Add user authentication"`
@@ -101,9 +106,10 @@ Given that feature description, do this:
    - The JSON output will contain BRANCH_NAME and SPEC_FILE paths
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot")
 
-3. Load the correct template based on the confirmed route:
-   - `full-spec` -> `.documentation/templates/spec-template.md`
-   - `quick-spec` -> `.documentation/templates/quick-spec-template.md`
+3. Load the correct template based on the confirmed route, then load the shared validation contract:
+   - `full-spec` -> `/.devspark/templates/spec-template.md` in installed repos, or `templates/spec-template.md` in source repos
+   - `quick-spec` -> `/.devspark/templates/quick-spec-template.md` in installed repos, or `templates/quick-spec-template.md` in source repos
+   - Shared validation contract -> `/.devspark/templates/spec-validation-contract.md` in installed repos, or `templates/spec-validation-contract.md` in source repos
 
 4. Follow this execution flow:
 
@@ -133,9 +139,9 @@ Given that feature description, do this:
 
 5. Write the specification to SPEC_FILE using the selected template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings. **Ensure the `**Status**:` field is explicitly set to `Draft`** — this is the starting state of the spec lifecycle (`Draft → In Progress → Complete`). The status will transition to `In Progress` when `/devspark.implement` starts and `Complete` when all tasks are done.
 
-6. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+6. **Specification Quality Validation**: After writing the initial spec, validate it against the shared specification validation contract plus the quality criteria below:
 
-   a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure with these validation items:
+   a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure. The checklist MUST include the shared validation contract checks first, then these quality checks:
 
       ```markdown
       # Specification Quality Checklist: [FEATURE NAME]
@@ -146,6 +152,9 @@ Given that feature description, do this:
 
       ## Content Quality
 
+      - [ ] Frontmatter matches the shared validation contract
+      - [ ] Required headings for the selected route are present in canonical order
+      - [ ] Status line uses a valid lifecycle state
       - [ ] No implementation details (languages, frameworks, APIs)
       - [ ] Focused on user value and business needs
       - [ ] Written for non-technical stakeholders
@@ -174,7 +183,7 @@ Given that feature description, do this:
       - Items marked incomplete require spec updates before `/devspark.clarify` or `/devspark.plan`
       ```
 
-   b. **Run Validation Check**: Review the spec against each checklist item:
+   b. **Run Validation Check**: Review the spec against each checklist item and the shared contract:
       - For each item, determine if it passes or fails
       - Document specific issues found (quote relevant spec sections)
 
@@ -182,11 +191,11 @@ Given that feature description, do this:
 
       - **If all items pass**: Mark checklist complete and proceed to step 6
 
-      - **If items fail (excluding [NEEDS CLARIFICATION])**:
-        1. List the failing items and specific issues
-        2. Update the spec to address each issue
-        3. Re-run validation until all items pass (max 3 iterations)
-        4. If still failing after 3 iterations, document remaining issues in checklist notes and warn user
+         - **If items fail (excluding [NEEDS CLARIFICATION])**:
+            1. List the failing items and specific issues
+            2. Update the spec to address each issue, using the shared validation contract as the repair target
+            3. Re-run validation until all items pass (max 3 iterations)
+            4. If still failing after 3 iterations, document remaining issues in checklist notes and warn user
 
       - **If [NEEDS CLARIFICATION] markers remain**:
         1. Extract all [NEEDS CLARIFICATION: ...] markers from the spec
@@ -229,7 +238,7 @@ Given that feature description, do this:
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
-## General Guidelines
+## Guidelines
 
 ## Quick Guidelines
 

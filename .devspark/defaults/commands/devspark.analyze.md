@@ -1,5 +1,12 @@
 ---
 description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
+handoffs:
+  - label: Implement Project
+    agent: devspark.implement
+    prompt: Start the implementation in phases
+  - label: Revise Plan
+    agent: devspark.plan
+    prompt: Revise plan to address analysis findings
 scripts:
   sh: .devspark/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: .devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
@@ -13,7 +20,7 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Goal
+## Overview
 
 Identify inconsistencies, duplications, ambiguities, and underspecified items across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/devspark.tasks` has successfully produced a complete `tasks.md`.
 
@@ -25,9 +32,13 @@ Read the YAML frontmatter in `spec.md` before analyzing. Treat `classification`,
 
 **Constitution Authority**: The project constitution (`/.documentation/memory/constitution.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks—not dilution, reinterpretation, or silent ignoring of the principle. If a principle itself needs to change, that must occur in a separate, explicit constitution update outside `/devspark.analyze`.
 
-## Execution Steps
+## Outline
+
+**Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
 
 ### 1. Initialize Analysis Context
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
 
@@ -184,7 +195,7 @@ After producing the report:
 - Treat the YAML gate block as authoritative for downstream commands such as `/devspark.tasks`, `/devspark.implement`, `/devspark.create-pr`, and `/devspark.pr-review`
 - When rerun, replace the previous `analyze.md` artifact instead of appending duplicate reports
 
-## Operating Principles
+## Guidelines
 
 ### Context Efficiency
 
@@ -204,3 +215,20 @@ After producing the report:
 ## Context
 
 {ARGS}
+
+## Shared Review Resolution Contract Output
+
+When emitting findings (review observations, issues, recommendations), structure each entry to include the shared resolution contract fields so downstream tools (/devspark.address-pr-review, telemetry, harvest) can act on them deterministically:
+
+```yaml
+findings:
+  - finding_id: <stable-id-unique-within-this-command-output>   # e.g., analyze-001, clarify-002
+    severity: critical | high | medium | low
+    description: <1-3 sentence problem statement>
+    recommended_action: <machine-actionable next step>
+    execution_mode: auto | selective | manual
+    status: open                                                  # set to `resolved` after remediation
+    outcome: ""                                                  # populated post-resolution by address-pr-review
+```
+
+inding_id MUST be stable across re-runs when the underlying issue is unchanged. xecution_mode MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation). The `status` and `outcome` fields are written by `/devspark.address-pr-review` (FR-028).

@@ -50,7 +50,7 @@ Register a new application in the DevSpark multi-app registry at `.documentation
    - Confirm scaffolded directories
    - Print scope summary
 
-## Validation Rules
+## Constraints
 
 - If the registry file does not exist, create it with `version: 1`, `mode: "multi-app"`, empty `profiles`, and the new app as the first entry
 - If the `id` already exists, fail with a clear duplicate error and do not modify the registry

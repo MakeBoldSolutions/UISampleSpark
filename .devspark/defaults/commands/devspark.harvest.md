@@ -1,5 +1,5 @@
 ---
-description: Harvest knowledge from completed specs and stale docs into living documentation, rewrite stale spec-linked comments, then archive obsolete artifacts
+description: Canonical knowledge-preserving cleanup workflow for completed specs, stale docs, comment cleanup, and archival
 handoffs:
   - label: Review Release Artifacts
     agent: devspark.release
@@ -20,9 +20,11 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Goal
+## Overview
 
 Harvest valuable knowledge from completed specs, stale documentation, and in-process drafts into living project documentation, then archive obsolete source material.
+
+`/devspark.harvest` is the canonical lifecycle cleanup command. `/devspark.archive` is a deprecated compatibility alias and should be treated as an invocation of `/devspark.harvest`, not as a separate workflow.
 
 This command is a **knowledge-preserving cleanup** workflow:
 
@@ -60,6 +62,8 @@ Multiple scopes may be combined: `--scope=specs,comments`
 **Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
 
 ### 1. Initialize Harvest Context
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 Run `{SCRIPT}` and parse its JSON output.
 
@@ -114,7 +118,48 @@ Treat spec folders under `/.documentation/specs/` as:
 
 Classify files under `/.documentation/` using category, taxonomy, usefulness score, and disposition.
 
-Use the following disposition semantics:
+##### Taxonomy Scoring Rubric
+
+Score each documentation artifact on 4 dimensions and compute a weighted total:
+
+| Dimension | Weight | Score 0 | Score 50 | Score 100 |
+|-----------|--------|---------|---------|---------|
+| **Operational Relevance** | 40% | Never used day-to-day | Referenced occasionally | Used in regular development workflow |
+| **Authority** | 25% | Duplicate or informal | Partial canonical source | Canonical and sole source for its topic |
+| **Uniqueness** | 20% | Fully duplicated elsewhere | Partially duplicated | Information exists nowhere else |
+| **Freshness** | 15% | Not updated in 6+ months | Updated within 3 months | Updated within 30 days |
+
+**Weighted Score** = (Relevance × 0.40) + (Authority × 0.25) + (Uniqueness × 0.20) + (Freshness × 0.15)
+
+The result is always in the range 0–100.
+
+Score ranges drive dispositions:
+
+| Score Range | Disposition | Action |
+|-------------|------------|--------|
+| 80–100 | `keep` | Living reference — no action |
+| 50–79 | `keep_refresh` or `consolidate` | Refresh content or merge with related doc |
+| 20–49 | `rewrite` or `archive` | Harvest knowledge then archive |
+| 0–19 | `archive` | Archive immediately after confirming no unique knowledge |
+
+##### Retention Policy by Document Type
+
+Apply these retention rules **before** running the scoring rubric — hard rules override scores:
+
+| Document Type | Retention Rule |
+|---------------|---------------|
+| **ADRs** (Architecture Decision Records) | Keep indefinitely — architectural decisions do not expire |
+| **Harvest reports** | Cap to last 30 days or 5 most-recent reports; archive older ones |
+| **PR reviews** | Archive after the PR is merged and 30 days have elapsed |
+| **Session drafts / notes** | Archive when the originating branch is merged |
+| **Reference data samples** | Keep only while actively referenced by tests; archive otherwise |
+| **Constitution** | Never archive; always `keep` |
+| **Active guides** | Apply scoring rubric; keep if score ≥ 50 |
+| **Completed audits** | Archive after 60 days unless referenced by an open spec |
+
+##### Disposition Semantics
+
+Use the following disposition values (scoring rubric + retention rules drive the final selection):
 
 - `keep`
 - `keep_refresh`
@@ -207,7 +252,7 @@ Write a report to the script-provided `report_path` containing:
 - harvested knowledge destinations
 - active items intentionally left in place
 
-## Anti-Patterns
+## Constraints
 
 Do not:
 

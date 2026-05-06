@@ -1,5 +1,13 @@
 ---
 description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
+handoffs:
+  - label: Create Pull Request
+    agent: devspark.create-pr
+    prompt: Draft a pull request for the implemented changes
+    send: true
+  - label: Run Analysis
+    agent: devspark.analyze
+    prompt: Analyze spec consistency after implementation
 scripts:
   sh: .devspark/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: .devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
@@ -16,6 +24,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Outline
 
 **Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 1. Run `{SCRIPT}` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
@@ -138,6 +148,11 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Provide clear error messages with context for debugging
    - Suggest next steps if implementation cannot proceed
    - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+
+   Additional governance expectations for create-pr/pr-review transitions:
+
+   - Delivery status must be met (`create_pr_ready=true` in latest harness result)
+   - Branch sync must pass (`HEAD` not behind `origin/main`)
 
 10. Completion validation:
     - Verify all required tasks are completed

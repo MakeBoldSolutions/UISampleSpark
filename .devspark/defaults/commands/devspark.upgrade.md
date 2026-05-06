@@ -293,7 +293,7 @@ Report a post-upgrade summary:
 ```
 Post-Upgrade Verification
   VERSION stamp      : 1.2.4  (was 1.1.0)
-  defaults/commands/ : updated (25 prompts)
+  defaults/commands/ : updated (27 prompts)
   commands/          : unchanged (team customizations preserved)
   stock scripts/     : updated (15 scripts)
   team scripts/      : unchanged (overrides preserved)

@@ -8,6 +8,8 @@ description: Display all registered applications in the multi-app repository wit
 $ARGUMENTS
 ```
 
+You **MUST** consider the user input before proceeding (if not empty).
+
 ## Outline
 
 Read and display the DevSpark multi-app registry. This is a **read-only** command — no files are modified.

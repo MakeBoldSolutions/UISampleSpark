@@ -45,6 +45,7 @@ Parse `$ARGUMENTS` for options:
 | Option | Description |
 |--------|-------------|
 | `{version}` | Explicit version (e.g., `2.0.0` or `v2.0.0`) |
+| `--from <date>` | Override the release window start date (`YYYY-MM-DD`) |
 | `--dry-run` | Preview changes without writing files |
 
 ## Outline
@@ -52,6 +53,8 @@ Parse `$ARGUMENTS` for options:
 **Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
 
 ### 1. Initialize Release Context
+
+> **Script Resolution**: Before running `{SCRIPT}`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
 
 Run `{SCRIPT}` to gather context and parse JSON output for:
 
@@ -64,6 +67,8 @@ Run `{SCRIPT}` to gather context and parse JSON output for:
 - `VERSION_SOURCE`: Where version was read from
 - `NEXT_VERSION`: Proposed next version
 - `VERSION_BUMP`: Type of bump (major/minor/patch)
+- `RELEASE_FROM`: Start date for the release window
+- `RELEASE_TO`: End date for the release window
 - `COMPLETED_SPECS`: List of specs ready for archival
 - `PENDING_SPECS`: List of incomplete specs
 - `QUICKFIXES`: List of quickfixes since last release
@@ -71,9 +76,18 @@ Run `{SCRIPT}` to gather context and parse JSON output for:
 - `LAST_RELEASE_DATE`: Date of last release
 - `COMMITS_SINCE_RELEASE`: Commit count since last release
 - `CONTRIBUTORS`: List of contributors
+- `MERGED_PR_NUMBERS`: Pull request numbers detected in the release window
+- `MERGED_PR_COUNT`: Number of merged PRs detected in the release window
+- `PR_REVIEW_SUMMARY`: Aggregated PR review stats (`files_changed`, `tests_added`, `breaking_changes`, `resolved_high_findings`)
 - `DRY_RUN`: Whether this is a preview run
 - `DEVSPARK_VERSION_PATH`: Path to `.devspark/VERSION`
 - `INSTALLED_VERSION`: Version recorded in the stamp file (blank if absent)
+
+The release context should be built from the full release window, not only the specs archived during the current command run. Prefer the following sources in order:
+
+1. Active `.documentation/` artifacts
+2. `.archive/<date>/` batches whose dates fall within `{RELEASE_FROM}..{RELEASE_TO}`
+3. Git history and PR review metadata within the same window
 
 ### 2. Version Confirmation
 
@@ -84,6 +98,7 @@ Display proposed version:
 
 - **Current Version**: {CURRENT_VERSION} (from {VERSION_SOURCE})
 - **Proposed Version**: {NEXT_VERSION} ({VERSION_BUMP} bump)
+- **Release Window**: {RELEASE_FROM} → {RELEASE_TO}
 - **Reason**: {N} completed specs, {M} quickfixes
 
 Confirm this version or provide explicit version:
@@ -252,9 +267,11 @@ Create `/.documentation/releases/v{NEXT_VERSION}/release-notes.md`:
 
 - **Version**: v{NEXT_VERSION}
 - **Release Date**: {RELEASE_DATE}
+- **Release Window**: {RELEASE_FROM} → {RELEASE_TO}
 - **Previous Version**: {LAST_TAG}
 - **Commits**: {COMMITS_SINCE_RELEASE}
 - **Contributors**: {CONTRIBUTORS count}
+- **Merged PRs**: {MERGED_PR_COUNT}
 
 ## Highlights
 
@@ -310,6 +327,10 @@ Create `/.documentation/releases/v{NEXT_VERSION}/release-notes.md`:
 |--------|-------|
 | Features Delivered | {completed specs count} |
 | Bugs Fixed | {quickfixes count} |
+| PRs Merged | {MERGED_PR_COUNT} |
+| Files Changed | {PR_REVIEW_SUMMARY.files_changed} |
+| Tests Added | {PR_REVIEW_SUMMARY.tests_added} |
+| Breaking Changes | {PR_REVIEW_SUMMARY.breaking_changes} |
 | ADRs Created | {ADR count} |
 | Contributors | {contributors count} |
 | Commits | {commits count} |
@@ -327,12 +348,24 @@ Create `/.documentation/releases/v{NEXT_VERSION}/metrics.json`:
 {
   "version": "{NEXT_VERSION}",
   "releaseDate": "{RELEASE_DATE}",
+   "release": {
+      "from": "{RELEASE_FROM}",
+      "to": "{RELEASE_TO}"
+   },
   "previousVersion": "{LAST_TAG}",
   "features": {
     "completed": {count},
     "deferred": {count}
   },
   "quickfixes": {count},
+   "pullRequests": {
+      "merged": {MERGED_PR_COUNT},
+      "numbers": [{MERGED_PR_NUMBERS}],
+      "filesChanged": {PR_REVIEW_SUMMARY.files_changed},
+      "testsAdded": {PR_REVIEW_SUMMARY.tests_added},
+      "breakingChanges": {PR_REVIEW_SUMMARY.breaking_changes},
+      "resolvedHighFindings": {PR_REVIEW_SUMMARY.resolved_high_findings}
+   },
   "adrs": {count},
   "commits": {count},
   "contributors": {count},
@@ -413,7 +446,42 @@ Ensure future roadmap section version ranges (`Near-Term`, `Medium-Term`, `Long-
 
 Run a quick search for the **old** version string (`{CURRENT_VERSION}`) across `README.md`, `release_notes.md`, `.documentation/*.md`, and confirm every remaining reference is intentional (e.g., CHANGELOG history). Flag any stale occurrences for manual review.
 
-### 11. Clean Slate Preparation
+### 11. Markdownlint Preflight (Required)
+
+Before finalizing release output, run a full markdown lint pass and fail closed on any violations.
+
+#### A. Run markdownlint-cli2
+
+Execute from repository root:
+
+```bash
+npx markdownlint-cli2 "**/*.md" "#node_modules"
+```
+
+If local policy requires a different invocation, use the repository-standard equivalent but keep full-repo coverage.
+
+#### B. Produce a detailed findings report
+
+If lint fails, parse and print a structured report with:
+
+- Rule ID (e.g., `MD036`, `MD050`)
+- File path
+- Line number
+- Short message
+
+Include grouped counts by rule and by file so the author can fix quickly.
+
+#### C. Block release completion on lint errors
+
+If any markdownlint violations remain:
+
+- Mark release as **BLOCKED**
+- Do **not** proceed to completion messaging
+- Return explicit remediation guidance with the failing file/line/rule list
+
+Continue only when markdownlint exits cleanly.
+
+### 12. Clean Slate Preparation
 
 After archival (skip if DRY_RUN):
 
@@ -436,7 +504,7 @@ For each quickfix in QUICKFIXES:
 1. Create `/.documentation/specs/.gitkeep` if directory is empty
 2. Create `/.documentation/quickfixes/.gitkeep` if directory is empty
 
-### 12. Output Summary
+### 13. Output Summary
 
 #### Dry Run Output
 

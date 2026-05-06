@@ -343,7 +343,9 @@ if ($sourceBranch -match '^(\d+-[a-zA-Z].*)$') {
     if (Test-Path $specPath) {
         # Extract Status field from spec.md
         $specContent = Get-Content $specPath -Raw
-        if ($specContent -match '\*\*Status\*\*:\s*([A-Za-z ]+?)(?:\s*<!--.*?-->)?\s*$') {
+        # Multiline mode so $ matches end-of-line; tolerate trailing
+        # "<!-- Valid: ... -->" helper comment from the spec template.
+        if ($specContent -match '(?m)^\*\*Status\*\*:\s*([A-Za-z ]+?)(?:\s*<!--.*?-->)?\s*$') {
             $specStatus = $Matches[1].Trim()
         } else {
             $specStatus = "Unknown"
