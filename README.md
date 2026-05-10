@@ -1,9 +1,21 @@
 # UISampleSpark
 
+**Live Site**: [ui.makeboldspark.com](https://ui.makeboldspark.com)
+
 A .NET 10 (ASP.NET Core) application exploring multiple front-end technologies for building modern web user interfaces. This repository is an educational reference that compares UI patterns — MVC, Razor Pages, React, Vue, htmx, Blazor, and vanilla JavaScript SPA — using a common Employee/Department domain, with theming, containerization, and deployment examples.
 
 [![Docker Image](https://github.com/markhazleton/UISampleSpark/actions/workflows/docker-image.yml/badge.svg)](https://github.com/markhazleton/UISampleSpark/actions/workflows/docker-image.yml)
 [![CodeQL](https://github.com/markhazleton/UISampleSpark/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/markhazleton/UISampleSpark/actions/workflows/codeql-analysis.yml)
+
+---
+## About
+
+UISampleSpark demonstrates how the same Employee/Department CRUD domain can be implemented across seven distinct front-end UI patterns — MVC, Razor Pages, jQuery AJAX, React, Vue, htmx, and Blazor — within a single ASP.NET Core application. It covers theming, containerization, REST APIs, and CI/CD.
+
+Live site: [ui.makeboldspark.com](https://ui.makeboldspark.com)
+
+> Built by [Mark Hazleton](https://markhazleton.com) — Technical Solutions Architect
+> Part of the [MakeBoldSpark](https://makeboldspark.com) portfolio of technical demonstrations.
 
 ---
 ## Project History
@@ -18,7 +30,7 @@ See the [CHANGELOG](CHANGELOG.md) for the full milestone timeline, and open `rep
 
 ---
 ## Live Deployments
-- Windows IIS VM (.NET 9): https://samplecrud.markhazleton.com/
+- Live Site: https://ui.makeboldspark.com
 - Docker Hub Image: https://hub.docker.com/r/markhazleton/uisamplespark
 
 ---
