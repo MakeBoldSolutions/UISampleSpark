@@ -157,6 +157,24 @@ if (requireApiKey && configuredApiKeys.Length > 0)
 }
 
 app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value ?? string.Empty;
+    bool hasQuery = context.Request.QueryString.HasValue;
+    bool isApiPath = path.StartsWith("/api", StringComparison.OrdinalIgnoreCase);
+    bool isCrudUtilityPath = path.Contains("/create", StringComparison.OrdinalIgnoreCase)
+        || path.Contains("/edit", StringComparison.OrdinalIgnoreCase)
+        || path.Contains("/delete", StringComparison.OrdinalIgnoreCase);
+
+    if (hasQuery || isApiPath || isCrudUtilityPath)
+    {
+        context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+    }
+
+    await next();
+});
+
 app.UseRateLimiter();
 app.UseAuthorization();
 app.UseSession();
@@ -188,3 +206,8 @@ app.MapControllerRoute(
 app.UseMarkdown();
 
 app.Run();
+
+/// <summary>
+/// Exposes the entry point type for integration tests.
+/// </summary>
+public partial class Program;

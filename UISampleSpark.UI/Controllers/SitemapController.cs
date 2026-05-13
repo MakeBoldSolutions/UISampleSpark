@@ -161,7 +161,6 @@ public class SitemapController : Controller
             
             // Razor Pages
             new SitemapUrl { Url = $"{baseUrl}/EmployeeRazor", Priority = "0.8", ChangeFreq = "daily", LastMod = now },
-            new SitemapUrl { Url = $"{baseUrl}/EmployeeRazor/Create", Priority = "0.6", ChangeFreq = "monthly", LastMod = now },
         };
     }
 
@@ -183,7 +182,19 @@ public class SitemapController : Controller
     {
         if (string.IsNullOrEmpty(action)) return true;
 
-        var excludedActions = new[] { "Delete", "Edit", "Privacy" };
+        var excludedActions = new[]
+        {
+            "Create",
+            "Delete",
+            "DeleteConfirm",
+            "Edit",
+            "GetEmployeeDelete",
+            "GetEmployeeEdit",
+            "GetEmployeeList",
+            "Privacy",
+            "Save",
+            "Table"
+        };
         return excludedActions.Contains(action, StringComparer.OrdinalIgnoreCase);
     }
 

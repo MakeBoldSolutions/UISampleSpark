@@ -1,20 +1,49 @@
 User-agent: *
 Allow: /
+Disallow: /*?*
+Disallow: /swagger/
+Disallow: /health
+Disallow: /MvcEmployee/
+Disallow: /api/
+Disallow: /*/Create
+Disallow: /*/Edit
+Disallow: /*/Delete
 
 # Allow common crawlers
 User-agent: Googlebot
 Allow: /
+Disallow: /*?*
+Disallow: /api/
+Disallow: /*/Create
+Disallow: /*/Edit
+Disallow: /*/Delete
 
 User-agent: Bingbot
 Allow: /
+Disallow: /*?*
+Disallow: /api/
+Disallow: /*/Create
+Disallow: /*/Edit
+Disallow: /*/Delete
 
-# Disallow admin and API documentation areas
-Disallow: /swagger/
-Disallow: /health
-Disallow  /MvcEmployee/
+# AI and agent crawlers
+User-agent: GPTBot
+Disallow: /
 
-# Allow API endpoints for public access
-Allow: /api/
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
 
 # Sitemap location (will be dynamically generated)
 Sitemap: /sitemap.xml

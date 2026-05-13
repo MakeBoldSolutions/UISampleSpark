@@ -9,9 +9,10 @@
     var host = request.Host;
     var path = request.Path;
     var queryString = request.QueryString;
+    var pathValue = request.Path.Value ?? string.Empty;
 
-    // Construct the canonical URL based on the current path
-    var canonicalUrl = $"{scheme}://{host}{path}{queryString}";
+    // Canonical URL should not include query string variants
+    var canonicalUrl = $"{scheme}://{host}{path}";
     var baseUrl = $"{scheme}://{host}";
 
     // Safely retrieve route data values and handle potential nulls
@@ -32,6 +33,13 @@
     Title = ViewData["Title"] as string ?? Title;
     Description = ViewData["Description"] as string ?? Description;
     Keywords = ViewData["Keywords"] as string ?? Keywords;
+
+    var isApiPath = pathValue.StartsWith("/api", StringComparison.OrdinalIgnoreCase);
+    var hasQueryString = queryString.HasValue;
+    var isCrudUtilityPage = pathValue.Contains("/create", StringComparison.OrdinalIgnoreCase)
+        || pathValue.Contains("/edit", StringComparison.OrdinalIgnoreCase)
+        || pathValue.Contains("/delete", StringComparison.OrdinalIgnoreCase);
+    var robotsContent = (isApiPath || hasQueryString || isCrudUtilityPage) ? "noindex, nofollow" : "index, follow";
 
     // Generate breadcrumbs for structured data
     var breadcrumbs = BreadcrumbHelper.GenerateBreadcrumbs(ViewContext);
@@ -94,7 +102,7 @@
 <title>@Title - UISampleSpark</title>
 <meta name="description" content="@Description" />
 <meta name="keywords" content="@Keywords" />
-<meta name="robots" content="index, follow" />
+<meta name="robots" content="@robotsContent" />
 <meta name="author" content="Mark Hazleton" />
 <link rel="canonical" href="@canonicalUrl" />
 

@@ -73,6 +73,7 @@ public class EmployeeController : BaseController
     [HttpGet]
     public async Task<ActionResult> GetEmployeeList(PagingParameterModel? paging)
     {
+        Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
         if (paging == null)
             paging = new PagingParameterModel();
 

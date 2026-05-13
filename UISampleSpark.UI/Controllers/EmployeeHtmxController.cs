@@ -51,6 +51,7 @@ public class EmployeeHtmxController : BaseController
     [HttpGet]
     public async Task<IActionResult> Table(int page = 1, int pageSize = 10, string? search = null)
     {
+        Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
         var allEmployees = await _client.GetEmployeesAsync(new PagingParameterModel(), cts.Token).ConfigureAwait(false);
 
         // Apply search filter if provided
