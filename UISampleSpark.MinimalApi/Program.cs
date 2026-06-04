@@ -1,19 +1,45 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.RateLimiting;
 using UISampleSpark.Core.Interfaces;
 using UISampleSpark.Core.Models;
 using UISampleSpark.Data.Models;
 using UISampleSpark.Data.Services;
 using UISampleSpark.MinimalApi.Helpers;
 using UISampleSpark.MinimalApi.Middleware;
-using UISampleSpark.MinimalApi.Endpoints;
-using System.Threading.RateLimiting;
-using System.Security.Cryptography;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info = new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "UI Sample Spark API",
+            Description = """
+                Employee management API for the UI Sample Spark educational project.
+
+                Demonstrates .NET 10 Minimal API patterns including rate limiting,
+                API key authentication, and RFC 7807 ProblemDetails error responses.
+
+                **Authentication:** Pass your API key in the `X-API-Key` request header.
+                """,
+            Contact = new OpenApiContact
+            {
+                Name = "Mark Hazleton",
+                Url = new Uri("https://markhazleton.com")
+            }
+        };
+        return Task.CompletedTask;
+    });
+});
+
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddHealthChecks();
@@ -38,20 +64,6 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0,
                 AutoReplenishment = true
             });
-    });
-});
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v8",
-        Title = "UI Sample Spark API",
-        Description = "Employee management API for UI Sample Spark",
-        Contact = new OpenApiContact
-        {
-            Name = "Mark Hazleton",
-            Url = new Uri("https://markhazleton.com")
-        },
     });
 });
 
@@ -81,59 +93,97 @@ ValueTask<object?> ApiKeyFilter(EndpointFilterInvocationContext context, Endpoin
     return next(context);
 }
 
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseExceptionHandler();
-app.UseSwagger();
-app.UseSwaggerUI();
+app.MapOpenApi();
+app.MapGet("/swagger", () => Results.Redirect("https://apitest.makeboldspark.com/")).ExcludeFromDescription();
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 
 app.MapHealthChecks("/health");
 
-app.MapPost("/employees", async (IEmployeeService employeeService, EmployeeDto employee, CancellationToken token) =>
-{
-    var result = await employeeService.SaveAsync(employee, token);
-    if (result is null)
-    {
-        return Results.BadRequest("Employee not saved");
-    }
-    if (result.Resource is null)
-    {
-        return Results.BadRequest("Employee not saved");
-    }
-    if (!result.Success)
-    {
-        return Results.BadRequest("Employee not saved");
-    }
-
-    return Results.Created($"/employees/{result.Resource.Id}", result);
-}).AddEndpointFilter(ApiKeyFilter).RequireRateLimiting("PerIpLimit");
-
 app.MapGet("/employees", async (IEmployeeService employeeService, CancellationToken token) =>
 {
     var paging = new PagingParameterModel();
-    var employees = await employeeService.GetEmployeesAsync(paging, token);
+    var employees = await employeeService.GetEmployeesAsync(paging, token).ConfigureAwait(false);
     return employees;
-}).AddEndpointFilter(ApiKeyFilter).RequireRateLimiting("PerIpLimit");
+})
+.WithName("GetEmployees")
+.WithTags("Employees: Query")
+.WithSummary("List all employees")
+.WithDescription("""
+    Returns the full list of employees using default paging.
+
+    Results are sorted by employee ID. Use the departments endpoint
+    to look up valid department values.
+    """)
+.Produces<EmployeeList>(StatusCodes.Status200OK)
+.Produces<ProblemDetails>(StatusCodes.Status429TooManyRequests)
+.Produces(StatusCodes.Status401Unauthorized)
+.AddEndpointFilter(ApiKeyFilter)
+.RequireRateLimiting("PerIpLimit");
 
 app.MapGet("/employees/{id}", async (IEmployeeService employeeService, int id, CancellationToken token) =>
 {
-    var employee = await employeeService.FindEmployeeByIdAsync(id, token);
+    var employee = await employeeService.FindEmployeeByIdAsync(id, token).ConfigureAwait(false);
     if (employee == null)
     {
         return Results.NotFound();
     }
     return Results.Ok(employee);
-}).AddEndpointFilter(ApiKeyFilter).RequireRateLimiting("PerIpLimit");
+})
+.WithName("GetEmployeeById")
+.WithTags("Employees: Query")
+.WithSummary("Get employee by ID")
+.WithDescription("Returns a single employee record matching the provided integer ID.")
+.Produces<EmployeeDto>(StatusCodes.Status200OK)
+.Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+.Produces<ProblemDetails>(StatusCodes.Status429TooManyRequests)
+.Produces(StatusCodes.Status401Unauthorized)
+.AddEndpointFilter(ApiKeyFilter)
+.RequireRateLimiting("PerIpLimit");
+
+app.MapPost("/employees", async (IEmployeeService employeeService, EmployeeDto employee, CancellationToken token) =>
+{
+    var result = await employeeService.SaveAsync(employee, token).ConfigureAwait(false);
+    if (result is null || result.Resource is null || !result.Success)
+    {
+        return Results.BadRequest("Employee not saved");
+    }
+
+    return Results.Created($"/employees/{result.Resource.Id}", result);
+})
+.WithName("CreateEmployee")
+.WithTags("Employees: Command")
+.WithSummary("Create a new employee")
+.WithDescription("""
+    Creates a new employee record. The request body must include all required fields:
+    `name`, `age` (minimum 18), `state`, `country`, and `department`.
+
+    Returns **201 Created** with the saved employee wrapped in a response envelope.
+    """)
+.Produces<EmployeeResponse>(StatusCodes.Status201Created)
+.Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+.Produces<ProblemDetails>(StatusCodes.Status429TooManyRequests)
+.Produces(StatusCodes.Status401Unauthorized)
+.AddEndpointFilter(ApiKeyFilter)
+.RequireRateLimiting("PerIpLimit");
 
 app.MapGet("/departments", async (IEmployeeService employeeService, CancellationToken token) =>
 {
-    var employee = await employeeService.GetDepartmentsAsync(false, token);
-    return employee;
-}).AddEndpointFilter(ApiKeyFilter).RequireRateLimiting("PerIpLimit");
+    var departments = await employeeService.GetDepartmentsAsync(false, token).ConfigureAwait(false);
+    return departments;
+})
+.WithName("GetDepartments")
+.WithTags("Departments: Query")
+.WithSummary("List all departments")
+.WithDescription("Returns all departments defined in the system, excluding soft-deleted entries.")
+.Produces<DepartmentDto[]>(StatusCodes.Status200OK)
+.Produces<ProblemDetails>(StatusCodes.Status429TooManyRequests)
+.Produces(StatusCodes.Status401Unauthorized)
+.AddEndpointFilter(ApiKeyFilter)
+.RequireRateLimiting("PerIpLimit");
 
 app.Run();
 
@@ -169,4 +219,3 @@ static bool IsApiKeyAuthorized(HttpRequest request, bool requireApiKey, IReadOnl
         .Select(Encoding.UTF8.GetBytes)
         .Any(expected => CryptographicOperations.FixedTimeEquals(provided, expected));
 }
-

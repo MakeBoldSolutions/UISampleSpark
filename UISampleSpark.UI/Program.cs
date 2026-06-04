@@ -1,6 +1,6 @@
+using ApiTestSpark;
 using Microsoft.OpenApi;
 using UISampleSpark.UI.Middleware;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using WebSpark.Bootswatch;
 using WebSpark.HttpClientUtility.RequestResult;
 using Westwind.AspNetCore.Markdown;
@@ -10,7 +10,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 
 // Lightweight abuse protection: limit each client IP to 100 requests/minute.
 builder.Services.AddRateLimiter(options =>
@@ -37,19 +36,30 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// Configure Swagger/OpenAPI
-builder.Services.AddSwaggerGen(options =>
+// Configure OpenAPI document generation
+builder.Services.AddOpenApi(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
-        Version = "v10",
-        Title = "UI Sample Spark API",
-        Description = "Employee management API for UI Sample Spark",
-        Contact = new OpenApiContact
+        document.Info = new OpenApiInfo
         {
-            Name = "Mark Hazleton",
-            Url = new Uri("https://markhazleton.com")
-        },
+            Version = "v1",
+            Title = "UI Sample Spark API",
+            Description = """
+                Employee management API for the UI Sample Spark educational project.
+
+                Demonstrates ASP.NET Core MVC, Razor Pages, Blazor, React, Vue, and htmx
+                alongside rate limiting, API key authentication, and RFC 7807 error responses.
+
+                **Authentication:** Pass your API key in the `X-API-Key` request header.
+                """,
+            Contact = new OpenApiContact
+            {
+                Name = "Mark Hazleton",
+                Url = new Uri("https://markhazleton.com")
+            }
+        };
+        return Task.CompletedTask;
     });
 });
 
@@ -113,14 +123,13 @@ else
     app.UseHsts();
 }
 
-// Swagger configuration
-app.UseSwagger();
-app.UseSwaggerUI(options =>
+// OpenAPI document endpoint + ApiTestSpark harness
+app.MapOpenApi();
+app.MapApiTestSpark(options =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "UI Sample Spark API v10");
-    options.DocumentTitle = "UI Sample Spark API";
-    options.InjectStylesheet("/swagger_custom/custom.css");
-    options.RoutePrefix = "swagger";
+    options.OpenApiUrl = "/openapi/v1.json";
+    options.AuthScheme = "ApiKey";
+    options.EnableDemoIntegrations = false;
 });
 
 // Request pipeline

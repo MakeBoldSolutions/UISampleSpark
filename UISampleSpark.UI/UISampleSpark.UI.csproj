@@ -25,6 +25,11 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)</OpenApiDocumentsDirectory>
+  </PropertyGroup>
+
   <!-- Performance and Configuration Settings -->
   <PropertyGroup>
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
@@ -33,8 +38,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="3.1.1" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="3.1.2" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
@@ -44,10 +49,16 @@
     </PackageReference>
     <PackageReference Include="OpenTelemetry.Api" Version="1.15.3" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
-    <PackageReference Include="WebSpark.Bootswatch" Version="1.34.0" />
-    <PackageReference Include="WebSpark.HttpClientUtility" Version="2.5.0" />
-    <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.40.0" />
+    <PackageReference Include="ApiTestSpark" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.6" />
+    <PackageReference Include="WebSpark.Bootswatch" Version="2.5.1" />
+    <PackageReference Include="WebSpark.HttpClientUtility" Version="2.5.1" />
+    <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.41.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,18 +81,6 @@
 
   <ItemGroup>
     <Content Update="wwwroot\README.md">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\swagger_custom\custom.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\swagger_custom\favicon-16x16.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\swagger_custom\favicon-32x32.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\swagger_custom\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
