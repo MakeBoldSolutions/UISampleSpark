@@ -1,0 +1,549 @@
+@{
+    ViewBag.Title = "Vanilla JavaScript | Pure Browser API CRUD";
+    ViewBag.MetaDescription = "Employee CRUD demo using zero JavaScript libraries — only the native fetch API, DOM APIs, and CSS from Bootstrap already on the page.";
+    ViewBag.MetaKeywords = "vanilla JavaScript, fetch API, no libraries, pure JS, DOM, CRUD, ASP.NET Core, REST API";
+}
+
+<div class="container py-4">
+
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0">
+                <i class="bi bi-braces text-warning me-2"></i>Pure Vanilla JavaScript
+            </h1>
+            <p class="text-muted mb-0">Zero libraries &mdash; fetch, DOM, and CSS only</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnOpenAdd">
+            <i class="bi bi-plus-circle me-1"></i>Add Employee
+        </button>
+    </div>
+
+    
+    <div id="alertBanner" class="alert d-none" role="alert"></div>
+
+    
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center py-2">
+            <span class="fw-semibold">Employees</span>
+            <div class="input-group" style="max-width:260px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="search" id="searchInput" class="form-control form-control-sm" placeholder="Filter…" aria-label="Filter employees">
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0" id="employeeTable" aria-label="Employee list">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Profile</th>
+                            <th scope="col" data-col="name" class="sortable" role="button" tabindex="0" aria-sort="none">Name <i class="bi bi-arrow-down-up ms-1 text-secondary small"></i></th>
+                            <th scope="col" data-col="genderName" class="sortable" role="button" tabindex="0" aria-sort="none">Gender <i class="bi bi-arrow-down-up ms-1 text-secondary small"></i></th>
+                            <th scope="col" data-col="age" class="sortable" role="button" tabindex="0" aria-sort="none">Age <i class="bi bi-arrow-down-up ms-1 text-secondary small"></i></th>
+                            <th scope="col" data-col="state" class="sortable" role="button" tabindex="0" aria-sort="none">State <i class="bi bi-arrow-down-up ms-1 text-secondary small"></i></th>
+                            <th scope="col" data-col="country" class="sortable" role="button" tabindex="0" aria-sort="none">Country <i class="bi bi-arrow-down-up ms-1 text-secondary small"></i></th>
+                            <th scope="col" data-col="departmentName" class="sortable" role="button" tabindex="0" aria-sort="none">Department <i class="bi bi-arrow-down-up ms-1 text-secondary small"></i></th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeBody">
+                        <tr id="loadingRow">
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>Loading…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center py-2 small text-muted">
+            <span id="tableInfo"></span>
+            <div id="pagination" class="d-flex gap-1"></div>
+        </div>
+    </div>
+
+    
+    
+    <div id="dialogBackdrop" class="modal-backdrop fade d-none" aria-hidden="true"></div>
+    <div id="employeeDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"
+         class="modal fade d-none" tabindex="-1" style="display:block!important">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dialogTitle">Add Employee</h5>
+                    <button type="button" class="btn-close" id="btnDialogClose" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="employeeForm" novalidate>
+                        <input type="hidden" id="fldId" value="0">
+
+                        <div class="mb-3">
+                            <label for="fldName" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="fldName" required minlength="1" autocomplete="name" placeholder="Full name">
+                            <div class="invalid-feedback">Name is required.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fldGender" class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select class="form-select" id="fldGender" required>
+                                <option value="" disabled selected>Select gender</option>
+                                <option value="0">Male</option>
+                                <option value="1">Female</option>
+                                <option value="2">Non-Binary</option>
+                                <option value="3">Other</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a gender.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fldAge" class="form-label">Age <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="fldAge" required min="18" max="100" placeholder="Minimum 18">
+                            <div class="invalid-feedback">Age must be between 18 and 100.</div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label for="fldState" class="form-label">State <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fldState" required placeholder="State">
+                                <div class="invalid-feedback">State is required.</div>
+                            </div>
+                            <div class="col-6">
+                                <label for="fldCountry" class="form-label">Country <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fldCountry" required placeholder="Country">
+                                <div class="invalid-feedback">Country is required.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fldDepartment" class="form-label">Department <span class="text-danger">*</span></label>
+                            <select class="form-select" id="fldDepartment" required>
+                                <option value="" disabled selected>Select department</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a department.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnSave">
+                        <i class="bi bi-check-circle me-1"></i><span id="btnSaveLabel">Add Employee</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="toastRegion" class="position-fixed bottom-0 end-0 p-3" style="z-index:1100" aria-live="polite" aria-atomic="false"></div>
+
+    
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0 h5"><i class="bi bi-braces me-2"></i>About This Demo</h3>
+        </div>
+        <div class="card-body">
+            <p class="lead mb-3">
+                This page uses <strong>zero JavaScript libraries</strong>. Every interaction
+                is handled by APIs built into every modern browser.
+            </p>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body">
+                            <h5><i class="bi bi-check-circle-fill text-success me-2"></i>What is used</h5>
+                            <ul class="mb-0">
+                                <li><code>fetch()</code> — HTTP requests to the REST API</li>
+                                <li><code>document.querySelector()</code> / <code>getElementById()</code></li>
+                                <li><code>addEventListener()</code> — all event handling</li>
+                                <li><code>HTMLElement.innerHTML</code> / <code>textContent</code></li>
+                                <li><code>FormData</code> / <code>form.checkValidity()</code></li>
+                                <li>Bootstrap CSS classes already on the page (no Bootstrap JS)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body">
+                            <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>What is NOT used</h5>
+                            <ul class="mb-0">
+                                <li>jQuery (no <code>$</code>)</li>
+                                <li>DataTables</li>
+                                <li>Bootstrap JS (no <code>bootstrap.*</code>)</li>
+                                <li>React / Vue / Angular / htmx</li>
+                                <li>Any <code>&lt;script src="…"&gt;</code> beyond what the layout already loads</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h5><i class="bi bi-code-slash me-2"></i>Key patterns</h5>
+            <pre class="bg-light p-3 rounded small"><code>// GET — load employees
+const res = await fetch('/api/employee');
+const data = await res.json();
+
+// POST — create
+await fetch('/api/employee', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(employee)
+});
+
+// DELETE
+await fetch(`/api/employee/${id}`, { method: 'DELETE' });</code></pre>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-tools me-2"></i>Implementation by Mark Hazleton</span>
+            <a href="https://github.com/markhazleton/UISampleSpark" class="btn btn-outline-warning btn-sm" target="_blank" rel="noopener">
+                <i class="bi bi-github me-2"></i>View Source
+            </a>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+(() => {
+  'use strict';
+
+  // ── State ──────────────────────────────────────────────────────
+  let employees = [];
+  let filtered  = [];
+  let sortCol   = 'name';
+  let sortAsc   = true;
+  let page      = 1;
+  const PAGE_SIZE = 10;
+
+  // ── DOM refs ───────────────────────────────────────────────────
+  const tbody       = document.getElementById('employeeBody');
+  const searchInput = document.getElementById('searchInput');
+  const tableInfo   = document.getElementById('tableInfo');
+  const pagination  = document.getElementById('pagination');
+  const alertBanner = document.getElementById('alertBanner');
+
+  const dialog        = document.getElementById('employeeDialog');
+  const backdrop      = document.getElementById('dialogBackdrop');
+  const dialogTitle   = document.getElementById('dialogTitle');
+  const btnSaveLabel  = document.getElementById('btnSaveLabel');
+  const form          = document.getElementById('employeeForm');
+
+  const fldId         = document.getElementById('fldId');
+  const fldName       = document.getElementById('fldName');
+  const fldGender     = document.getElementById('fldGender');
+  const fldAge        = document.getElementById('fldAge');
+  const fldState      = document.getElementById('fldState');
+  const fldCountry    = document.getElementById('fldCountry');
+  const fldDepartment = document.getElementById('fldDepartment');
+
+  // ── API helpers ────────────────────────────────────────────────
+  async function apiFetch(url, options = {}) {
+    const res = await fetch(url, {
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      ...options
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => res.statusText);
+      throw new Error(text || `HTTP ${res.status}`);
+    }
+    const ct = res.headers.get('content-type') || '';
+    return ct.includes('application/json') ? res.json() : null;
+  }
+
+  // ── Bootstrap-free toast ───────────────────────────────────────
+  function showToast(message, type = 'success') {
+    const region = document.getElementById('toastRegion');
+    const el = document.createElement('div');
+    el.className = `toast align-items-center text-white bg-${type} border-0 show mb-2`;
+    el.setAttribute('role', 'alert');
+    el.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">${escHtml(message)}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" aria-label="Close"></button>
+      </div>`;
+    el.querySelector('button').addEventListener('click', () => el.remove());
+    region.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── Bootstrap-free dialog ─────────────────────────────────────
+  function openDialog() {
+    dialog.classList.remove('d-none');
+    dialog.classList.add('show');
+    backdrop.classList.remove('d-none');
+    backdrop.classList.add('show');
+    document.body.classList.add('modal-open');
+    fldName.focus();
+  }
+
+  function closeDialog() {
+    dialog.classList.remove('show');
+    dialog.classList.add('d-none');
+    backdrop.classList.remove('show');
+    backdrop.classList.add('d-none');
+    document.body.classList.remove('modal-open');
+    form.classList.remove('was-validated');
+    form.reset();
+    fldId.value = '0';
+  }
+
+  // ── Departments ────────────────────────────────────────────────
+  async function loadDepartments() {
+    try {
+      const depts = await apiFetch('/api/department?IncludeEmployees=false');
+      // Keep the placeholder option, append the rest
+      while (fldDepartment.options.length > 1) fldDepartment.remove(1);
+      depts.forEach(d => {
+        const opt = new Option(d.name, d.id);
+        fldDepartment.add(opt);
+      });
+    } catch (err) {
+      showAlert('Could not load departments: ' + err.message, 'danger');
+    }
+  }
+
+  // ── Employees ──────────────────────────────────────────────────
+  async function loadEmployees() {
+    tbody.innerHTML = `
+      <tr id="loadingRow">
+        <td colspan="8" class="text-center py-4 text-muted">
+          <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>Loading…
+        </td>
+      </tr>`;
+    try {
+      const data = await apiFetch('/api/employee');
+      employees = Array.isArray(data) ? data : (data.list ?? []);
+      applyFilterAndSort();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-3">${escHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  // ── Filter + sort + paginate ───────────────────────────────────
+  function applyFilterAndSort() {
+    const q = searchInput.value.trim().toLowerCase();
+    filtered = q
+      ? employees.filter(e =>
+          [e.name, e.genderName, e.state, e.country, e.departmentName]
+            .some(v => v && String(v).toLowerCase().includes(q)))
+      : [...employees];
+
+    filtered.sort((a, b) => {
+      const av = a[sortCol] ?? '';
+      const bv = b[sortCol] ?? '';
+      const cmp = typeof av === 'number'
+        ? av - bv
+        : String(av).localeCompare(String(bv));
+      return sortAsc ? cmp : -cmp;
+    });
+
+    page = 1;
+    renderTable();
+  }
+
+  function renderTable() {
+    const total = filtered.length;
+    const start = (page - 1) * PAGE_SIZE;
+    const slice = filtered.slice(start, start + PAGE_SIZE);
+
+    if (slice.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">No employees found.</td></tr>`;
+      tableInfo.textContent = '';
+      pagination.innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = slice.map(e => `
+      <tr>
+        <td class="align-middle text-center">
+          <img src="/images/${escHtml(e.profile_picture ?? 'placeholder.png')}"
+               class="rounded-circle" width="40" height="40"
+               alt="${escHtml(e.name ?? '')}"
+               onerror="this.src='/images/placeholder.png'">
+        </td>
+        <td class="align-middle">${escHtml(e.name ?? '')}</td>
+        <td class="align-middle">${escHtml(e.genderName ?? '')}</td>
+        <td class="align-middle">${escHtml(String(e.age ?? ''))}</td>
+        <td class="align-middle">${escHtml(e.state ?? '')}</td>
+        <td class="align-middle">${escHtml(e.country ?? '')}</td>
+        <td class="align-middle">${escHtml(e.departmentName ?? '')}</td>
+        <td class="align-middle text-center">
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-outline-primary btn-edit" data-id="${e.id}" aria-label="Edit ${escHtml(e.name ?? '')}">
+              <i class="bi bi-pencil-square"></i> Edit
+            </button>
+            <button class="btn btn-outline-danger btn-delete" data-id="${e.id}" aria-label="Delete ${escHtml(e.name ?? '')}">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>`).join('');
+
+    // Table info
+    const end = Math.min(start + PAGE_SIZE, total);
+    tableInfo.textContent = `Showing ${start + 1}–${end} of ${total} employees`;
+
+    // Pagination
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    renderPagination(totalPages);
+
+    // Sort icons
+    document.querySelectorAll('th.sortable').forEach(th => {
+      const col = th.dataset.col;
+      const icon = th.querySelector('i');
+      icon.className = 'ms-1 small bi ' + (col !== sortCol
+        ? 'bi-arrow-down-up text-secondary'
+        : sortAsc ? 'bi-arrow-up text-white' : 'bi-arrow-down text-white');
+      th.setAttribute('aria-sort', col !== sortCol ? 'none' : sortAsc ? 'ascending' : 'descending');
+    });
+  }
+
+  function renderPagination(totalPages) {
+    pagination.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const mkBtn = (label, targetPage, disabled, active) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm ' + (active ? 'btn-primary' : 'btn-outline-secondary') + (disabled ? ' disabled' : '');
+      btn.innerHTML = label;
+      if (!disabled) btn.addEventListener('click', () => { page = targetPage; renderTable(); });
+      return btn;
+    };
+
+    pagination.appendChild(mkBtn('<i class="bi bi-chevron-left"></i>', page - 1, page === 1, false));
+    for (let p = 1; p <= totalPages; p++) {
+      pagination.appendChild(mkBtn(String(p), p, false, p === page));
+    }
+    pagination.appendChild(mkBtn('<i class="bi bi-chevron-right"></i>', page + 1, page === totalPages, false));
+  }
+
+  // ── Alert banner ───────────────────────────────────────────────
+  function showAlert(msg, type = 'danger') {
+    alertBanner.className = `alert alert-${type} alert-dismissible`;
+    alertBanner.innerHTML = escHtml(msg) +
+      `<button type="button" class="btn-close" aria-label="Close"></button>`;
+    alertBanner.querySelector('button').addEventListener('click', () => alertBanner.classList.add('d-none'));
+    alertBanner.classList.remove('d-none');
+    alertBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ── CRUD ───────────────────────────────────────────────────────
+  async function saveEmployee() {
+    form.classList.add('was-validated');
+    if (!form.checkValidity()) return;
+
+    const id = parseInt(fldId.value, 10) || 0;
+    const employee = {
+      id,
+      name:       fldName.value.trim(),
+      gender:     parseInt(fldGender.value, 10),
+      age:        parseInt(fldAge.value, 10),
+      state:      fldState.value.trim(),
+      country:    fldCountry.value.trim(),
+      department: parseInt(fldDepartment.value, 10)
+    };
+
+    const isNew = id === 0;
+    try {
+      if (isNew) {
+        await apiFetch('/api/employee', { method: 'POST', body: JSON.stringify(employee) });
+        showToast('Employee added successfully.', 'success');
+      } else {
+        await apiFetch(`/api/employee/${id}`, { method: 'PUT', body: JSON.stringify(employee) });
+        showToast('Employee updated successfully.', 'success');
+      }
+      closeDialog();
+      await loadEmployees();
+    } catch (err) {
+      showToast((isNew ? 'Add' : 'Update') + ' failed: ' + err.message, 'danger');
+    }
+  }
+
+  async function deleteEmployee(id, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try {
+      await apiFetch(`/api/employee/${id}`, { method: 'DELETE' });
+      showToast('Employee deleted.', 'success');
+      await loadEmployees();
+    } catch (err) {
+      showToast('Delete failed: ' + err.message, 'danger');
+    }
+  }
+
+  async function openEditDialog(id) {
+    try {
+      const data = await apiFetch(`/api/employee/${id}`);
+      const emp = data.resource ?? data;
+      fldId.value      = emp.id;
+      fldName.value    = emp.name ?? '';
+      fldGender.value  = String(emp.gender ?? '');
+      fldAge.value     = emp.age ?? '';
+      fldState.value   = emp.state ?? '';
+      fldCountry.value = emp.country ?? '';
+      fldDepartment.value = String(emp.department ?? '');
+      dialogTitle.textContent = 'Edit Employee';
+      btnSaveLabel.textContent = 'Save Changes';
+      openDialog();
+    } catch (err) {
+      showToast('Could not load employee: ' + err.message, 'danger');
+    }
+  }
+
+  // ── Event wiring ───────────────────────────────────────────────
+  document.getElementById('btnOpenAdd').addEventListener('click', () => {
+    form.reset();
+    form.classList.remove('was-validated');
+    fldId.value = '0';
+    dialogTitle.textContent = 'Add Employee';
+    btnSaveLabel.textContent = 'Add Employee';
+    openDialog();
+  });
+
+  document.getElementById('btnSave').addEventListener('click', saveEmployee);
+  document.getElementById('btnCancel').addEventListener('click', closeDialog);
+  document.getElementById('btnDialogClose').addEventListener('click', closeDialog);
+
+  // Close on backdrop click
+  backdrop.addEventListener('click', closeDialog);
+
+  // Close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDialog(); });
+
+  // Table delegation — edit / delete
+  tbody.addEventListener('click', e => {
+    const editBtn   = e.target.closest('.btn-edit');
+    const deleteBtn = e.target.closest('.btn-delete');
+    if (editBtn)   openEditDialog(parseInt(editBtn.dataset.id, 10));
+    if (deleteBtn) {
+      const row  = deleteBtn.closest('tr');
+      const name = row.cells[1].textContent;
+      deleteEmployee(parseInt(deleteBtn.dataset.id, 10), name);
+    }
+  });
+
+  // Search
+  searchInput.addEventListener('input', applyFilterAndSort);
+
+  // Sortable column headers
+  document.querySelectorAll('th.sortable').forEach(th => {
+    const activate = () => {
+      const col = th.dataset.col;
+      if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+      applyFilterAndSort();
+    };
+    th.addEventListener('click', activate);
+    th.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+  });
+
+  // ── Boot ───────────────────────────────────────────────────────
+  loadDepartments();
+  loadEmployees();
+})();
+</script>
+}
