@@ -48,7 +48,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.7" />
     <PackageReference Include="WebSpark.Bootswatch" Version="2.5.1" />
     <PackageReference Include="WebSpark.HttpClientUtility" Version="2.5.1" />
-    <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.40.0" />
+    <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.41.0" />
   </ItemGroup>
 
   <ItemGroup>
