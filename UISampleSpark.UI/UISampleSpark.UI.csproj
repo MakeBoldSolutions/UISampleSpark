@@ -55,7 +55,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.OpenApi" Version="2.7.6" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
     <PackageReference Include="WebSpark.Bootswatch" Version="2.5.1" />
     <PackageReference Include="WebSpark.HttpClientUtility" Version="2.5.1" />
     <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.41.0" />
