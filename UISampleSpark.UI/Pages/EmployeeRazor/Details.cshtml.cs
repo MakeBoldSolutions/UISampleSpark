@@ -9,13 +9,13 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
     /// </summary>
     public class DetailsModel : PageModel
     {
-        private readonly EmployeeContext _context;
+        private readonly Core.Models.Data.EmployeeContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DetailsModel"/> class
         /// </summary>
         /// <param name="context">Database context for employee data</param>
-        public DetailsModel(EmployeeContext context)
+        public DetailsModel(Core.Models.Data.EmployeeContext context)
         {
             _context = context;
         }
@@ -23,7 +23,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
         /// <summary>
         /// Gets or sets the employee to display details for
         /// </summary>
-        public Employee Employee { get; set; } = default!;
+        public Core.Models.Data.Employee Employee { get; set; } = default!;
 
         /// <summary>
         /// Handles GET requests to display the employee details page
@@ -37,7 +37,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
                 return NotFound();
             }
 
-            Employee? employee = await _context.Employees.FirstOrDefaultAsync(m => m.Id == id);
+            Core.Models.Data.Employee? employee = await _context.Employees.FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
                 return NotFound();

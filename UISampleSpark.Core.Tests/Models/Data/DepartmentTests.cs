@@ -1,6 +1,6 @@
 using System;
 
-namespace UISampleSpark.Data.Tests.Models
+namespace UISampleSpark.Core.Tests.Models.Data
 {
     [TestClass]
     public class DepartmentTests
@@ -9,7 +9,7 @@ namespace UISampleSpark.Data.Tests.Models
         public void TestMethod1()
         {
             // Arrange
-            Department department = new Department()
+            Core.Models.Data.Department department = new Core.Models.Data.Department()
             {
                 Name = "Department",
                 CreatedBy = "Test",

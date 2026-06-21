@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UISampleSpark.Data.Models;
+namespace UISampleSpark.Core.Models.Data;
 
-public class Employee : BaseEntity, IEmployee
+public class Employee : Data.BaseEntity, Data.IEmployee
 {
     /// <summary>
     /// Gets or sets the name.
@@ -33,7 +33,7 @@ public class Employee : BaseEntity, IEmployee
     /// Gets or sets the department navigation property.
     /// </summary>
     [ForeignKey(nameof(DepartmentId))]
-    public Department? Department { get; set; }
+    public Data.Department? Department { get; set; }
 
     /// <summary>
     /// Gets or sets the employee manager identifier.
@@ -48,5 +48,5 @@ public class Employee : BaseEntity, IEmployee
     /// <summary>
     /// Gets or sets the employee gender.
     /// </summary>
-    public Gender Gender { get; set; }
+    public Data.Gender Gender { get; set; }
 }

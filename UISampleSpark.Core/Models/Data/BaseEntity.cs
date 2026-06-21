@@ -1,5 +1,4 @@
-
-namespace UISampleSpark.Data.Models;
+namespace UISampleSpark.Core.Models.Data;
 public enum Gender
 {
     Male,

@@ -1,7 +1,7 @@
 
 using UISampleSpark.Core.Extensions;
 
-namespace UISampleSpark.Data.Repository;
+namespace UISampleSpark.Core.Repository;
 
 /// <summary>
 /// Direct database access repository for employee and department entities.
@@ -13,26 +13,26 @@ namespace UISampleSpark.Data.Repository;
 /// </remarks>
 public class EmployeeDB : IEmployeeDB
 {
-    private readonly EmployeeContext _context;
-    private readonly ILogger<EmployeeDB> _logger;
+    private readonly Models.Data.EmployeeContext _context;
+    private readonly ILogger<Repository.EmployeeDB> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmployeeDB"/> class.
     /// </summary>
     /// <param name="context">The database context for employee data access.</param>
     /// <param name="logger">Logger for structured logging and diagnostics.</param>
-    public EmployeeDB(EmployeeContext context, ILogger<EmployeeDB> logger)
+    public EmployeeDB(Models.Data.EmployeeContext context, ILogger<Repository.EmployeeDB> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    private static List<EmployeeDto> Create(List<Employee> list)
+    private static List<EmployeeDto> Create(List<Models.Data.Employee> list)
     {
         if (list == null) return new List<EmployeeDto>();
         return list.Select(item => Create(item)).OrderBy(x => x.Name).ToList();
     }
-    private static List<DepartmentDto> Create(List<Department> list)
+    private static List<DepartmentDto> Create(List<Models.Data.Department> list)
     {
         List<DepartmentDto> returnList = new();
 
@@ -42,7 +42,7 @@ public class EmployeeDB : IEmployeeDB
 
         return returnList ?? new List<DepartmentDto>();
     }
-    private static DepartmentDto Create(Department item)
+    private static DepartmentDto Create(Models.Data.Department item)
     {
         if (item == null)
             throw new ArgumentException("Department can not be null");
@@ -60,7 +60,7 @@ public class EmployeeDB : IEmployeeDB
         return dept;
     }
 
-    private static EmployeeDto Create(Employee entity)
+    private static EmployeeDto Create(Models.Data.Employee entity)
     {
         return new EmployeeDto(
             entity.Id,
@@ -76,7 +76,7 @@ public class EmployeeDB : IEmployeeDB
 
     public async Task<bool> DeleteEmployeeAsync(int ID)
     {
-        Employee? delEmployee = await _context.Employees.FindAsync(ID);
+        Models.Data.Employee? delEmployee = await _context.Employees.FindAsync(ID);
         if (delEmployee is null)
         {
             return false;
@@ -104,7 +104,7 @@ public class EmployeeDB : IEmployeeDB
     {
         try
         {
-            List<Department> dbDeptList = await _context.Departments.OrderBy(o => o.Name).ToListAsync();
+            List<Models.Data.Department> dbDeptList = await _context.Departments.OrderBy(o => o.Name).ToListAsync();
             return Create(dbDeptList);
         }
         catch (Exception ex)
@@ -116,7 +116,7 @@ public class EmployeeDB : IEmployeeDB
 
     public async Task<EmployeeDto?> EmployeeAsync(int id)
     {
-        Employee? empEntity = await _context.Employees.Where(w => w.Id == id).FirstOrDefaultAsync();
+        Models.Data.Employee? empEntity = await _context.Employees.Where(w => w.Id == id).FirstOrDefaultAsync();
         return empEntity is null ? null : Create(empEntity);
     }
 
@@ -131,7 +131,7 @@ public class EmployeeDB : IEmployeeDB
 
         if (emp.Id == 0)
         {
-            Employee saveUser = new Employee()
+            Models.Data.Employee saveUser = new Models.Data.Employee()
             {
                 Name = emp.Name,
                 State = emp.State,
@@ -139,7 +139,7 @@ public class EmployeeDB : IEmployeeDB
                 Country = emp.Country,
                 DepartmentId = (int)emp.Department,
                 ProfilePicture = emp.ProfilePicture ?? "default.jpg",
-                Gender = (Gender)emp.Gender
+                Gender = (Models.Data.Gender)emp.Gender
             };
             await _context.Employees.AddAsync(saveUser);
             await _context.SaveChangesAsync();
@@ -147,7 +147,7 @@ public class EmployeeDB : IEmployeeDB
         }
         else
         {
-            Employee? saveUser = await _context.Employees.FindAsync(emp.Id);
+            Models.Data.Employee? saveUser = await _context.Employees.FindAsync(emp.Id);
 
             if (saveUser != null)
             {
@@ -159,12 +159,12 @@ public class EmployeeDB : IEmployeeDB
                 saveUser.DepartmentId = (int)emp.Department;
                 saveUser.ProfilePicture = emp.ProfilePicture ?? "default.jpg";
                 saveUser.LastUpdatedDate = DateTime.Now;
-                saveUser.Gender = (Gender)emp.Gender;
+                saveUser.Gender = (Models.Data.Gender)emp.Gender;
                 await _context.SaveChangesAsync();
             }
             else
             {
-                saveUser = new Employee()
+                saveUser = new Models.Data.Employee()
                 {
                     Id = emp.Id,
                     Name = emp.Name,
@@ -173,7 +173,7 @@ public class EmployeeDB : IEmployeeDB
                     Country = emp.Country,
                     DepartmentId = (int)emp.Department,
                     ProfilePicture = emp.ProfilePicture ?? "default.jpg",
-                    Gender = (Gender)emp.Gender,
+                    Gender = (Models.Data.Gender)emp.Gender,
                 };
                 await _context.Employees.AddAsync(saveUser);
                 await _context.SaveChangesAsync();
@@ -200,7 +200,7 @@ public class EmployeeDB : IEmployeeDB
             Description = dept.Description
         };
 
-        Department? saveDept = await _context.Departments.FindAsync(updateDept.Id);
+        Models.Data.Department? saveDept = await _context.Departments.FindAsync(updateDept.Id);
         if (saveDept != null)
         {
             _context.Departments.Attach(saveDept);
@@ -210,7 +210,7 @@ public class EmployeeDB : IEmployeeDB
         }
         else
         {
-            Department newDept = new Department()
+            Models.Data.Department newDept = new Models.Data.Department()
             {
                 Id = updateDept.Id,
                 Name = string.IsNullOrEmpty(updateDept.Name) ? "MISSING NAME" : updateDept.Name,

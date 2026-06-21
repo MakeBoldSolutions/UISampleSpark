@@ -1,8 +1,8 @@
-namespace UISampleSpark.Data.Models;
+namespace UISampleSpark.Core.Models.Data;
 
 public interface IDepartment
 {
     string Description { get; set; }
-    ICollection<Employee> Employees { get; set; }
+    ICollection<Data.Employee> Employees { get; set; }
     string Name { get; set; }
 }

@@ -7,13 +7,13 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
     /// </summary>
     public class IndexModel : PageModel
     {
-        private readonly EmployeeContext _context;
+        private readonly Core.Models.Data.EmployeeContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IndexModel"/> class
         /// </summary>
         /// <param name="context">Database context for employee data</param>
-        public IndexModel(EmployeeContext context)
+        public IndexModel(Core.Models.Data.EmployeeContext context)
         {
             _context = context;
         }
@@ -21,7 +21,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
         /// <summary>
         /// Gets or sets the collection of employees to display
         /// </summary>
-        public IList<Employee> Employee { get; set; } = default!;
+        public IList<Core.Models.Data.Employee> Employee { get; set; } = default!;
 
         /// <summary>
         /// Handles GET requests to load and display the list of employees

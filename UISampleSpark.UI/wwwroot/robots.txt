@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /*?*
-Disallow: /swagger/
+Disallow: /api-test-spark
 Disallow: /health
 Disallow: /MvcEmployee/
 Disallow: /api/

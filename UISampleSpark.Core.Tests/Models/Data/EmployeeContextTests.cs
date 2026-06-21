@@ -1,10 +1,9 @@
 
-using UISampleSpark.Data.Repository;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UISampleSpark.Data.Tests.Models;
+namespace UISampleSpark.Core.Tests.Models.Data;
 [TestClass]
 public class EmployeeContextTests
 {
@@ -12,18 +11,18 @@ public class EmployeeContextTests
     public async Task EmployeeContext_ExpectedBehaviorAsync()
     {
         // Arrange
-        DbContextOptions<EmployeeContext> options = new DbContextOptionsBuilder<EmployeeContext>()
+        DbContextOptions<Core.Models.Data.EmployeeContext> options = new DbContextOptionsBuilder<Core.Models.Data.EmployeeContext>()
             .UseInMemoryDatabase("EmployeeTest")
             .Options;
-        using EmployeeContext context = new EmployeeContext(options);
+        using Core.Models.Data.EmployeeContext context = new Core.Models.Data.EmployeeContext(options);
         // Act
         await context.Database.EnsureDeletedAsync();
         await context.Database.EnsureCreatedAsync();
 
-        EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+        Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
         List<EmployeeResponse> employeeList = new List<EmployeeResponse>();
         List<DepartmentResponse> departmentList = new List<DepartmentResponse>();
-        EmployeeDatabaseService svc = new EmployeeDatabaseService(context, NullLogger<EmployeeDatabaseService>.Instance);
+        Core.Services.EmployeeDatabaseService svc = new Core.Services.EmployeeDatabaseService(context, NullLogger<Core.Services.EmployeeDatabaseService>.Instance);
 
         foreach (DepartmentDto dept in employeeMock.DepartmentCollection())
         {

@@ -6,14 +6,14 @@ Console.WriteLine("Setup SQL Lite Database");
 
 // Setup logger factory for dependency injection
 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-var serviceLogger = loggerFactory.CreateLogger<EmployeeDatabaseService>();
-var mockLogger = loggerFactory.CreateLogger<EmployeeMock>();
+var serviceLogger = loggerFactory.CreateLogger<UISampleSpark.Core.Services.EmployeeDatabaseService>();
+var mockLogger = loggerFactory.CreateLogger<UISampleSpark.Core.Repository.EmployeeMock>();
 
-DbContextOptions<EmployeeContext> options = new DbContextOptionsBuilder<EmployeeContext>()
+DbContextOptions<UISampleSpark.Core.Models.Data.EmployeeContext> options = new DbContextOptionsBuilder<UISampleSpark.Core.Models.Data.EmployeeContext>()
     .UseSqlite(@"Data Source=EmployeeConsole.db")
     .EnableSensitiveDataLogging(true)
     .Options;
-using EmployeeContext context = new EmployeeContext(options);
+using UISampleSpark.Core.Models.Data.EmployeeContext context = new UISampleSpark.Core.Models.Data.EmployeeContext(options);
 try
 {
     await context.Database.EnsureDeletedAsync();
@@ -31,14 +31,14 @@ catch (InvalidOperationException ex)
     Console.WriteLine(ex);
 }
 
-EmployeeDatabaseService employeeService = new EmployeeDatabaseService(context, serviceLogger);
+UISampleSpark.Core.Services.EmployeeDatabaseService employeeService = new UISampleSpark.Core.Services.EmployeeDatabaseService(context, serviceLogger);
 
 IEnumerable<EmployeeDto> employees = await employeeService.GetEmployeesAsync(new PagingParameterModel(), new CancellationToken());
 
 Console.WriteLine($"Service List Count:{employees?.Count()}");
 
 Console.WriteLine("Create MOCK to get sample Employees");
-EmployeeMock employeeMock = new EmployeeMock(mockLogger, 100);
+UISampleSpark.Core.Repository.EmployeeMock employeeMock = new UISampleSpark.Core.Repository.EmployeeMock(mockLogger, 100);
 List<EmployeeResponse> employeeList = new List<EmployeeResponse>();
 List<DepartmentResponse> departmentList = new List<DepartmentResponse>();
 

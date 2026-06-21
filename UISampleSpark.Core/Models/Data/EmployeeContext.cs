@@ -1,4 +1,4 @@
-namespace UISampleSpark.Data.Models;
+namespace UISampleSpark.Core.Models.Data;
 
 public class EmployeeContext : DbContext
 {
@@ -6,7 +6,7 @@ public class EmployeeContext : DbContext
     {
     }
 
-    public EmployeeContext(DbContextOptions<EmployeeContext> options) : base(options)
+    public EmployeeContext(DbContextOptions<Data.EmployeeContext> options) : base(options)
     {
     }
 
@@ -26,7 +26,7 @@ public class EmployeeContext : DbContext
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
-        modelBuilder.Entity<Employee>(entity =>
+        modelBuilder.Entity<Data.Employee>(entity =>
         {
             entity.HasKey(e => e.Id);
             
@@ -49,7 +49,7 @@ public class EmployeeContext : DbContext
             entity.HasIndex(e => e.Name);
         });
 
-        modelBuilder.Entity<Department>(entity =>
+        modelBuilder.Entity<Data.Department>(entity =>
         {
             entity.HasKey(d => d.Id);
 
@@ -65,6 +65,6 @@ public class EmployeeContext : DbContext
         });
     }
 
-    public DbSet<Employee> Employees => Set<Employee>();
-    public DbSet<Department> Departments => Set<Department>();
+    public DbSet<Data.Employee> Employees => Set<Data.Employee>();
+    public DbSet<Data.Department> Departments => Set<Data.Department>();
 }

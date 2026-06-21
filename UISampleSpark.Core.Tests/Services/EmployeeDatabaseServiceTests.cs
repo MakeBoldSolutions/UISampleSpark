@@ -1,11 +1,10 @@
 using UISampleSpark.Core.Interfaces;
-using UISampleSpark.Data.Repository;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UISampleSpark.Data.Tests.Services;
+namespace UISampleSpark.Core.Tests.Services;
 
 /// <summary>
 /// 
@@ -15,7 +14,7 @@ public sealed class EmployeeDatabaseServiceTests : IDisposable
 {
     private readonly CancellationToken ct;
     private IEmployeeService? employeeService;
-    private EmployeeContext? context;
+    private Core.Models.Data.EmployeeContext? context;
     private readonly string databaseName;
 
     public EmployeeDatabaseServiceTests()
@@ -142,13 +141,13 @@ public sealed class EmployeeDatabaseServiceTests : IDisposable
     {
         try
         {
-            DbContextOptionsBuilder<EmployeeContext> builder = new DbContextOptionsBuilder<EmployeeContext>();
+            DbContextOptionsBuilder<Core.Models.Data.EmployeeContext> builder = new DbContextOptionsBuilder<Core.Models.Data.EmployeeContext>();
             _ = builder.EnableSensitiveDataLogging(true);
             _ = builder.UseInMemoryDatabase(databaseName);
-            context = new EmployeeContext(builder.Options);
-            employeeService = new EmployeeDatabaseService(context, NullLogger<EmployeeDatabaseService>.Instance);
+            context = new Core.Models.Data.EmployeeContext(builder.Options);
+            employeeService = new Core.Services.EmployeeDatabaseService(context, NullLogger<Core.Services.EmployeeDatabaseService>.Instance);
 
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             foreach (DepartmentDto dept in employeeMock.DepartmentCollection())
             {
                 await employeeService.SaveAsync(dept, ct).ConfigureAwait(true);

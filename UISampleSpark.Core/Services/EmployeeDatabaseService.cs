@@ -1,4 +1,4 @@
-namespace UISampleSpark.Data.Services;
+namespace UISampleSpark.Core.Services;
 
 /// <summary>
 /// Database-backed implementation of employee service using Entity Framework Core.
@@ -13,21 +13,21 @@ namespace UISampleSpark.Data.Services;
 /// </remarks>
 public partial class EmployeeDatabaseService : IEmployeeService
 {
-    private readonly EmployeeContext _context;
-    private readonly ILogger<EmployeeDatabaseService> _logger;
+    private readonly Models.Data.EmployeeContext _context;
+    private readonly ILogger<Services.EmployeeDatabaseService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmployeeDatabaseService"/> class.
     /// </summary>
     /// <param name="context">The database context for employee data access.</param>
     /// <param name="logger">Logger for structured logging and diagnostics.</param>
-    public EmployeeDatabaseService(EmployeeContext context, ILogger<EmployeeDatabaseService> logger)
+    public EmployeeDatabaseService(Models.Data.EmployeeContext context, ILogger<Services.EmployeeDatabaseService> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    private static DepartmentDto? Create(Department? item)
+    private static DepartmentDto? Create(Models.Data.Department? item)
     {
         if (item is null) return null;
 
@@ -40,14 +40,14 @@ public partial class EmployeeDatabaseService : IEmployeeService
         };
     }
 
-    private static Department Create(DepartmentDto item) => new()
+    private static Models.Data.Department Create(DepartmentDto item) => new()
     {
         Id = item.Id,
         Name = item.Name,
         Description = item.Description ?? string.Empty,
     };
 
-    private static EmployeeDto? Create(Employee? item)
+    private static EmployeeDto? Create(Models.Data.Employee? item)
     {
         if (item is null) return null;
 
@@ -66,7 +66,7 @@ public partial class EmployeeDatabaseService : IEmployeeService
         };
     }
 
-    private static Employee Create(EmployeeDto item, Department dbDept) => new()
+    private static Models.Data.Employee Create(EmployeeDto item, Models.Data.Department dbDept) => new()
     {
         DepartmentId = dbDept.Id,
         Name = item.Name,
@@ -74,14 +74,14 @@ public partial class EmployeeDatabaseService : IEmployeeService
         Country = item.Country,
         Age = item.Age,
         ProfilePicture = item.ProfilePicture ?? "default.jpg",
-        Gender = (Gender)item.Gender,
+        Gender = (Models.Data.Gender)item.Gender,
         Id = item.Id
     };
 
-    private static EmployeeDto[] GetEmployeeDtos(List<Employee>? list) =>
+    private static EmployeeDto[] GetEmployeeDtos(List<Models.Data.Employee>? list) =>
         list?.Select(Create).OfType<EmployeeDto>().ToArray() ?? [];
 
-    private static DepartmentDto[] GetDepartmentDtos(List<Department>? list) =>
+    private static DepartmentDto[] GetDepartmentDtos(List<Models.Data.Department>? list) =>
         list?.Select(Create).OfType<DepartmentDto>().ToArray() ?? [];
 
     public async Task<int> AddMultipleEmployeesAsync(string?[]? namelist)
@@ -91,13 +91,13 @@ public partial class EmployeeDatabaseService : IEmployeeService
         Random rand = new();
         
         var employees = namelist
-            .Select(name => new Employee
+            .Select(name => new Models.Data.Employee
             {
                 Name = name ?? "UNKNOWN",
                 Age = rand.Next(18, 100),
                 Country = "USA",
                 DepartmentId = rand.Next(1, Enum.GetNames<EmployeeDepartmentEnum>().Length - 1),
-                Gender = (Gender)rand.Next(1, Enum.GetNames<Gender>().Length - 1),
+                Gender = (Models.Data.Gender)rand.Next(1, Enum.GetNames<Models.Data.Gender>().Length - 1),
                 State = "TX"
             })
             .ToList();
@@ -113,7 +113,7 @@ public partial class EmployeeDatabaseService : IEmployeeService
         if (id <= 0)
             return new EmployeeResponse("Invalid Employee Id for delete");
 
-        Employee? dbEmp = await _context.Employees.FindAsync([id], ct);
+        Models.Data.Employee? dbEmp = await _context.Employees.FindAsync([id], ct);
 
         if (dbEmp is null)
             return new EmployeeResponse("Employee Not Found");
@@ -184,12 +184,12 @@ public partial class EmployeeDatabaseService : IEmployeeService
     public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(PagingParameterModel paging, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(paging);
-        IQueryable<Employee> source = _context.Employees
+        IQueryable<Models.Data.Employee> source = _context.Employees
             .Include(i => i.Department)
             .OrderBy(o => o.Name)
             .AsNoTracking();
         
-        List<Employee> items = await source
+        List<Models.Data.Employee> items = await source
             .Skip((paging.PageNumber - 1) * paging.PageSize)
             .Take(paging.PageSize)
             .ToListAsync(token)
@@ -222,7 +222,7 @@ public partial class EmployeeDatabaseService : IEmployeeService
         if (item.Id <= 0)
             return new DepartmentResponse("Zero ID not allowed");
 
-        Department? dbDept = await _context.Departments
+        Models.Data.Department? dbDept = await _context.Departments
             .FindAsync([item.Id], cancellationToken)
             .ConfigureAwait(false);
 
@@ -261,14 +261,14 @@ public partial class EmployeeDatabaseService : IEmployeeService
                 newItem.Gender);
 
             int deptId = (int)item.Department;
-            Department? dbDept = await _context.Departments
+            Models.Data.Department? dbDept = await _context.Departments
                 .FindAsync([deptId], ct)
                 .ConfigureAwait(false);
 
             if (dbDept is null)
                 return new EmployeeResponse("Department not found");
 
-            Employee? dbEmp;
+            Models.Data.Employee? dbEmp;
 
             if (item.Id > 0)
             {
@@ -293,7 +293,7 @@ public partial class EmployeeDatabaseService : IEmployeeService
                     dbEmp.State = item.State;
                     dbEmp.LastUpdatedDate = DateTime.UtcNow;
                     dbEmp.ProfilePicture = item.ProfilePicture ?? "default.jpg";
-                    dbEmp.Gender = (Gender)item.Gender;
+                    dbEmp.Gender = (Models.Data.Gender)item.Gender;
                     _context.Update(dbEmp);
                 }
                 
@@ -306,7 +306,7 @@ public partial class EmployeeDatabaseService : IEmployeeService
                 await _context.SaveChangesAsync(ct).ConfigureAwait(false);
             }
 
-            Employee? local = _context.Set<Employee>()
+            Models.Data.Employee? local = _context.Set<Models.Data.Employee>()
                 .Local
                 .FirstOrDefault(entry => entry.Id.Equals(item.Id));
 
@@ -315,7 +315,7 @@ public partial class EmployeeDatabaseService : IEmployeeService
                 _context.Entry(local).State = EntityState.Detached;
             }
 
-            Employee? newEmp = await _context.Employees
+            Models.Data.Employee? newEmp = await _context.Employees
                 .Where(w => w.Id == dbEmp.Id)
                 .Include(i => i.Department)
                 .AsNoTracking()

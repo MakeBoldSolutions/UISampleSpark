@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.RateLimiting;
 using UISampleSpark.Core.Interfaces;
 using UISampleSpark.Core.Models;
-using UISampleSpark.Data.Models;
-using UISampleSpark.Data.Services;
 using UISampleSpark.MinimalApi.Helpers;
 using UISampleSpark.MinimalApi.Middleware;
 
@@ -67,10 +65,10 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-builder.Services.AddDbContext<EmployeeContext>(opt => opt.UseInMemoryDatabase("Employee"));
-builder.Services.AddScoped<IEmployeeService, EmployeeDatabaseService>();
-builder.Services.AddScoped<IEmployeeClient, EmployeeDatabaseClient>();
-using (var seedContext = new EmployeeContext())
+builder.Services.AddDbContext<UISampleSpark.Core.Models.Data.EmployeeContext>(opt => opt.UseInMemoryDatabase("Employee"));
+builder.Services.AddScoped<IEmployeeService, UISampleSpark.Core.Services.EmployeeDatabaseService>();
+builder.Services.AddScoped<IEmployeeClient, UISampleSpark.Core.Services.EmployeeDatabaseClient>();
+using (var seedContext = new UISampleSpark.Core.Models.Data.EmployeeContext())
 {
     SeedDatabase.DatabaseInitialization(seedContext);
 }
@@ -97,7 +95,6 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.MapOpenApi();
-app.MapGet("/swagger", () => Results.Redirect("https://apitest.makeboldspark.com/")).ExcludeFromDescription();
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 

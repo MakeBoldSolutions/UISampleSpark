@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using UISampleSpark.Data.Repository;
 
 namespace UISampleSpark.UI.Helpers;
 
@@ -12,17 +11,17 @@ public static class SeedDatabase
     /// Initializes the database with sample departments and employees
     /// </summary>
     /// <param name="context">The employee database context to seed</param>
-    public static async void DatabaseInitialization(EmployeeContext context)
+    public static async void DatabaseInitialization(Core.Models.Data.EmployeeContext context)
     {
         try
         {
             using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-            var serviceLogger = loggerFactory.CreateLogger<EmployeeDatabaseService>();
-            var mockLogger = loggerFactory.CreateLogger<EmployeeMock>();
-            
-            EmployeeDatabaseService employeeService = new EmployeeDatabaseService(context, serviceLogger);
+            var serviceLogger = loggerFactory.CreateLogger<Core.Services.EmployeeDatabaseService>();
+            var mockLogger = loggerFactory.CreateLogger<Core.Repository.EmployeeMock>();
+
+            Core.Services.EmployeeDatabaseService employeeService = new Core.Services.EmployeeDatabaseService(context, serviceLogger);
             CancellationToken token = new CancellationToken();
-            EmployeeMock employeeMock = new EmployeeMock(mockLogger, 290);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(mockLogger, 290);
 
             // First add all departments
             foreach (DepartmentDto dept in employeeMock.DepartmentCollection())

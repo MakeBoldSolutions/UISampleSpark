@@ -1,6 +1,6 @@
 using UISampleSpark.Core.Interfaces;
 
-namespace UISampleSpark.Data.Tests.Services;
+namespace UISampleSpark.Core.Tests.Services;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -18,7 +18,7 @@ public class EmployeeDatabaseClientTests
         string[] namelist = { "John", "Jane" };
         Mock<IEmployeeService> serviceMock = new Mock<IEmployeeService>();
         serviceMock.Setup(s => s.AddMultipleEmployeesAsync(namelist)).ReturnsAsync(2);
-        EmployeeDatabaseClient client = new EmployeeDatabaseClient(serviceMock.Object, NullLogger<EmployeeDatabaseClient>.Instance);
+        Core.Services.EmployeeDatabaseClient client = new Core.Services.EmployeeDatabaseClient(serviceMock.Object, NullLogger<Core.Services.EmployeeDatabaseClient>.Instance);
 
         // Act
         int result = await client.AddMultipleEmployeesAsync(namelist);
@@ -37,7 +37,7 @@ public class EmployeeDatabaseClientTests
         EmployeeResponse response = new EmployeeResponse();
         Mock<IEmployeeService> serviceMock = new Mock<IEmployeeService>();
         serviceMock.Setup(s => s.DeleteAsync(id, cancellationToken)).ReturnsAsync(response);
-        EmployeeDatabaseClient client = new EmployeeDatabaseClient(serviceMock.Object, NullLogger<EmployeeDatabaseClient>.Instance);
+        Core.Services.EmployeeDatabaseClient client = new Core.Services.EmployeeDatabaseClient(serviceMock.Object, NullLogger<Core.Services.EmployeeDatabaseClient>.Instance);
 
         // Act
         EmployeeResponse result = await client.DeleteAsync(id, cancellationToken);
@@ -56,7 +56,7 @@ public class EmployeeDatabaseClientTests
         DepartmentDto departmentDto = new DepartmentDto(EmployeeDepartmentEnum.IT);
         Mock<IEmployeeService> serviceMock = new Mock<IEmployeeService>();
         serviceMock.Setup(s => s.FindDepartmentByIdAsync(departmentId, cancellationToken)).ReturnsAsync(departmentDto);
-        EmployeeDatabaseClient client = new EmployeeDatabaseClient(serviceMock.Object, NullLogger<EmployeeDatabaseClient>.Instance);
+        Core.Services.EmployeeDatabaseClient client = new Core.Services.EmployeeDatabaseClient(serviceMock.Object, NullLogger<Core.Services.EmployeeDatabaseClient>.Instance);
 
         // Act
         DepartmentDto result = await client.FindDepartmentByIdAsync(departmentId, cancellationToken);
@@ -76,7 +76,7 @@ public class EmployeeDatabaseClientTests
         EmployeeResponse employeeResponse = new EmployeeResponse(employee);
         Mock<IEmployeeService> serviceMock = new Mock<IEmployeeService>();
         serviceMock.Setup(s => s.FindEmployeeByIdAsync(employeeId, cancellationToken)).ReturnsAsync(employeeResponse);
-        EmployeeDatabaseClient client = new EmployeeDatabaseClient(serviceMock.Object, NullLogger<EmployeeDatabaseClient>.Instance);
+        Core.Services.EmployeeDatabaseClient client = new Core.Services.EmployeeDatabaseClient(serviceMock.Object, NullLogger<Core.Services.EmployeeDatabaseClient>.Instance);
 
         // Act
         EmployeeResponse result = await client.FindEmployeeByIdAsync(employeeId, cancellationToken);
@@ -98,7 +98,7 @@ public class EmployeeDatabaseClientTests
         };
         Mock<IEmployeeService> serviceMock = new Mock<IEmployeeService>();
         serviceMock.Setup(s => s.GetDepartmentsAsync(includeEmployees, cancellationToken)).ReturnsAsync(departmentDtos);
-        EmployeeDatabaseClient client = new EmployeeDatabaseClient(serviceMock.Object, NullLogger<EmployeeDatabaseClient>.Instance);
+        Core.Services.EmployeeDatabaseClient client = new Core.Services.EmployeeDatabaseClient(serviceMock.Object, NullLogger<Core.Services.EmployeeDatabaseClient>.Instance);
 
         // Act
         IEnumerable<DepartmentDto> result = await client.GetDepartmentsAsync(includeEmployees, cancellationToken);

@@ -1,8 +1,7 @@
-using UISampleSpark.Data.Repository;
 using System;
 using System.Threading.Tasks;
 
-namespace UISampleSpark.Data.Tests.Repository
+namespace UISampleSpark.Core.Tests.Repository
 {
     [TestClass]
     public class EmployeeMockTests
@@ -11,7 +10,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task DepartmentAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int id = 1;
 
             // Act
@@ -25,7 +24,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task EmployeeAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int id = 0;
 
             // Act
@@ -38,7 +37,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task Delete_StateUnderTest_Id1()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int ID = 1;
 
             // Act
@@ -52,7 +51,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task Delete_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int ID = 0;
 
             // Act
@@ -66,7 +65,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task DeleteAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int ID = 0;
 
             // Act
@@ -81,7 +80,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public void DepartmentCollection_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
 
             // Act
             System.Collections.Generic.List<DepartmentDto> result = employeeMock.DepartmentCollection();
@@ -94,7 +93,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task DepartmentCollectionAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
 
             // Act
             System.Collections.Generic.List<DepartmentDto> result = await employeeMock.DepartmentCollectionAsync();
@@ -107,7 +106,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public void EmployeeCollection_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
 
             // Act
             System.Collections.Generic.List<EmployeeDto> result = employeeMock.EmployeeCollection();
@@ -120,7 +119,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task EmployeeCollectionAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
 
             // Act
             System.Collections.Generic.List<EmployeeDto> result = await employeeMock.EmployeeCollectionAsync();
@@ -132,7 +131,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task UpdateAsync_StateUnderTest_NotFoundID()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             EmployeeDto emp = new(
                 9999,
                 "Test",
@@ -153,7 +152,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task UpdateAsync_StateUnderTest_NotValid()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             EmployeeDto? emp = null;
 
             // Act
@@ -167,7 +166,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task UpdateAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             EmployeeDto? emp = null;
 
             // Act
@@ -181,7 +180,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task UpdateAsync_StateUnderTest_ExpectedBehavior1()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             DepartmentDto? dept = null;
 
             // Act
@@ -196,7 +195,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task Delete_StateUnderTest_ExpectedBehaviorNotFound()
         {
             // Arrange
-            EmployeeMock employeeMock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeMock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int ID = 0;
 
             // Act
@@ -210,7 +209,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task Employee_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeDB = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeDB = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int id = 0;
 
             // Act
@@ -224,7 +223,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task EmployeeCollection_ExpectedBehavior()
         {
             // Arrange
-            EmployeeMock employeeDB = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeDB = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
 
             // Act
             System.Collections.Generic.List<EmployeeDto> result = await employeeDB.EmployeeCollectionAsync();
@@ -237,7 +236,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task Update_StateUnderTest_ExpectedBehaviorNewEmployee()
         {
             // Arrange
-            EmployeeMock employeeDB = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock employeeDB = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             EmployeeDto newEmp = new(
                 9999,
                 "Test",
@@ -272,7 +271,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public void EmployeeMock_Constructor_WithGeneratedEmployees()
         {
             // Arrange & Act
-            EmployeeMock mock = new EmployeeMock(NullLogger<EmployeeMock>.Instance, 20);
+            Core.Repository.EmployeeMock mock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance, 20);
 
             // Assert
             System.Collections.Generic.List<EmployeeDto> employees = mock.EmployeeCollection();
@@ -284,7 +283,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task EmployeeMock_UpdateAsync_NewEmployee_ShouldAdd()
         {
             // Arrange
-            EmployeeMock mock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock mock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int initialCount = mock.EmployeeCollection().Count;
 
             EmployeeDto newEmp = new EmployeeDto(
@@ -308,7 +307,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task EmployeeMock_UpdateAsync_NullDepartment_ShouldReturnNull()
         {
             // Arrange
-            EmployeeMock mock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock mock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             DepartmentDto? nullDept = null;
 
             // Act
@@ -322,7 +321,7 @@ namespace UISampleSpark.Data.Tests.Repository
         public async Task EmployeeMock_DepartmentAsync_InvalidId_ShouldThrowOrReturnNull()
         {
             // Arrange
-            EmployeeMock mock = new EmployeeMock(NullLogger<EmployeeMock>.Instance);
+            Core.Repository.EmployeeMock mock = new Core.Repository.EmployeeMock(NullLogger<Core.Repository.EmployeeMock>.Instance);
             int invalidId = 9999;
 
             // Act  & Assert - EmployeeMock throws exception for invalid department IDs

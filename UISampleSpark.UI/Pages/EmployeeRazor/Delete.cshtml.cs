@@ -9,13 +9,13 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
     /// </summary>
     public class DeleteModel : PageModel
     {
-        private readonly EmployeeContext _context;
+        private readonly Core.Models.Data.EmployeeContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteModel"/> class
         /// </summary>
         /// <param name="context">Database context for employee data</param>
-        public DeleteModel(EmployeeContext context)
+        public DeleteModel(Core.Models.Data.EmployeeContext context)
         {
             _context = context;
         }
@@ -24,7 +24,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
         /// Gets or sets the employee to be deleted
         /// </summary>
         [BindProperty]
-        public Employee Employee { get; set; } = default!;
+        public Core.Models.Data.Employee Employee { get; set; } = default!;
 
         /// <summary>
         /// Handles GET requests to display the delete confirmation page
@@ -38,7 +38,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
                 return NotFound();
             }
 
-            Employee? employee = await _context.Employees.FirstOrDefaultAsync(m => m.Id == id);
+            Core.Models.Data.Employee? employee = await _context.Employees.FirstOrDefaultAsync(m => m.Id == id);
 
             if (employee == null)
             {
@@ -62,7 +62,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
             {
                 return NotFound();
             }
-            Employee? employee = await _context.Employees.FindAsync(id);
+            Core.Models.Data.Employee? employee = await _context.Employees.FindAsync(id);
 
             if (employee != null)
             {

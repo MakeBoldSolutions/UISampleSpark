@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using UISampleSpark.Core.Models;
-using UISampleSpark.Data.Models;
-using UISampleSpark.Data.Repository;
-using UISampleSpark.Data.Services;
 
 namespace UISampleSpark.MinimalApi.Helpers;
 
@@ -15,17 +12,17 @@ public static class SeedDatabase
     /// <summary>
     /// Initializes the database with sample departments and employees
     /// </summary>
-    public static async void DatabaseInitialization(EmployeeContext context)
+    public static async void DatabaseInitialization(Core.Models.Data.EmployeeContext context)
     {
         try
         {
             using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-            var serviceLogger = loggerFactory.CreateLogger<EmployeeDatabaseService>();
-            var mockLogger = loggerFactory.CreateLogger<EmployeeMock>();
+            var serviceLogger = loggerFactory.CreateLogger<Core.Services.EmployeeDatabaseService>();
+            var mockLogger = loggerFactory.CreateLogger<Core.Repository.EmployeeMock>();
 
-            var employeeService = new EmployeeDatabaseService(context, serviceLogger);
+            var employeeService = new Core.Services.EmployeeDatabaseService(context, serviceLogger);
             var token = new CancellationToken();
-            var employeeMock = new EmployeeMock(mockLogger, 290);
+            var employeeMock = new Core.Repository.EmployeeMock(mockLogger, 290);
             foreach (var dept in employeeMock.DepartmentCollection())
             {
                 await employeeService.SaveAsync(dept, token).ConfigureAwait(true);

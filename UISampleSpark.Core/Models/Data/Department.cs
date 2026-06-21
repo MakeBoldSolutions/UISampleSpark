@@ -1,9 +1,9 @@
-namespace UISampleSpark.Data.Models;
+namespace UISampleSpark.Core.Models.Data;
 
 /// <summary>
 /// Department entity
 /// </summary>
-public class Department : BaseEntity, IDepartment
+public class Department : Data.BaseEntity, Data.IDepartment
 {
     /// <summary>
     /// Gets or sets the department name.
@@ -18,5 +18,5 @@ public class Department : BaseEntity, IDepartment
     /// <summary>
     /// Gets or sets the collection of employees in this department.
     /// </summary>
-    public ICollection<Employee> Employees { get; set; } = [];
+    public ICollection<Data.Employee> Employees { get; set; } = [];
 }

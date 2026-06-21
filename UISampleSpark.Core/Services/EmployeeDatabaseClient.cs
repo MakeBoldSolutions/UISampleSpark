@@ -1,4 +1,4 @@
-namespace UISampleSpark.Data.Services;
+namespace UISampleSpark.Core.Services;
 
 /// <summary>
 /// Client wrapper for employee service operations with logging.
@@ -11,14 +11,14 @@ namespace UISampleSpark.Data.Services;
 public partial class EmployeeDatabaseClient : IEmployeeClient
 {
     private readonly IEmployeeService service;
-    private readonly ILogger<EmployeeDatabaseClient> _logger;
+    private readonly ILogger<Services.EmployeeDatabaseClient> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmployeeDatabaseClient"/> class.
     /// </summary>
     /// <param name="service">The underlying employee service for data operations.</param>
     /// <param name="logger">Logger for structured logging and diagnostics.</param>
-    public EmployeeDatabaseClient(IEmployeeService service, ILogger<EmployeeDatabaseClient> logger)
+    public EmployeeDatabaseClient(IEmployeeService service, ILogger<Services.EmployeeDatabaseClient> logger)
     {
         this.service = service;
         _logger = logger;

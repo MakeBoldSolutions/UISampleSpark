@@ -64,13 +64,13 @@ builder.Services.AddOpenApi(options =>
 });
 
 // Database and data access services
-builder.Services.AddDbContext<EmployeeContext>(opt => 
+builder.Services.AddDbContext<UISampleSpark.Core.Models.Data.EmployeeContext>(opt => 
     opt.UseInMemoryDatabase("Employee"));
-builder.Services.AddScoped<IEmployeeService, EmployeeDatabaseService>();
-builder.Services.AddScoped<IEmployeeClient, EmployeeDatabaseClient>();
+builder.Services.AddScoped<IEmployeeService, UISampleSpark.Core.Services.EmployeeDatabaseService>();
+builder.Services.AddScoped<IEmployeeClient, UISampleSpark.Core.Services.EmployeeDatabaseClient>();
 
 // Seed database during startup
-using (var context = new EmployeeContext())
+using (var context = new UISampleSpark.Core.Models.Data.EmployeeContext())
 {
     SeedDatabase.DatabaseInitialization(context);
 }

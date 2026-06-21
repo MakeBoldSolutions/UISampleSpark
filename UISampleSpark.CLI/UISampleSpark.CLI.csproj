@@ -47,6 +47,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\UISampleSpark.Core\UISampleSpark.Core.csproj" />
-    <ProjectReference Include="..\UISampleSpark.Data\UISampleSpark.Data.csproj" />
+
   </ItemGroup>
 </Project>

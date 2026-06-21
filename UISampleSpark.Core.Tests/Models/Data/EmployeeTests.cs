@@ -1,5 +1,4 @@
-
-namespace UISampleSpark.Data.Tests.Models;
+namespace UISampleSpark.Core.Tests.Models.Data;
 
 [TestClass]
 public class EmployeeTests
@@ -8,7 +7,7 @@ public class EmployeeTests
     public void Employee_Test()
     {
         // Arrange
-        Employee employee = new Employee
+        Core.Models.Data.Employee employee = new Core.Models.Data.Employee
         {
             Age = 20,
             Country = "USA",
@@ -16,7 +15,7 @@ public class EmployeeTests
             Id = 1,
             Name = "Test Employee",
             State = "TX",
-            Department = new Department()
+            Department = new Core.Models.Data.Department()
             {
                 Id = 1,
                 Name = "Test",
