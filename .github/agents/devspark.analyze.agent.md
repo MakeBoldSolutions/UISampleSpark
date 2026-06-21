@@ -1,5 +1,5 @@
 ---
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
+description: Non-destructive cross-artifact consistency, coverage, and traceability analysis across spec.md, plan.md, and tasks.md. Pairs with /devspark.critic as the dual pre-implement gate (analyze = are the artifacts internally aligned? critic = will the system survive production?).
 handoffs:
   - label: Implement Project
     agent: devspark.implement

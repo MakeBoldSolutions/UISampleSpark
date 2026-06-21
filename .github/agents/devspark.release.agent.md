@@ -1,9 +1,9 @@
 ---
-description: Archive development artifacts at release, distill key decisions into permanent documentation, and prepare for next development cycle
+description: Seal a release — version-stamp, generate CHANGELOG and release notes, create ADRs, and archive completed specs into the releases directory
 handoffs:
-  - label: View Release History
-    agent: devspark.release
-    prompt: Show me previous releases in .documentation/releases/
+  - label: Run Post-Release Harvest
+    agent: devspark.harvest
+    prompt: Clean up stale docs, rewrite spec-linked comments, and archive to .archive/ after the release is complete
   - label: Run Final Audit
     agent: devspark.site-audit
     prompt: Run a final site audit before release

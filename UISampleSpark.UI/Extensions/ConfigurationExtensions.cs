@@ -1,3 +1,5 @@
+using UISampleSpark.Core.Extensions;
+
 namespace UISampleSpark.UI.Extensions;
 
 /// <summary>
@@ -15,14 +17,13 @@ public static class ConfigurationExtensions
     {
         if (!string.IsNullOrEmpty(Value))
         {
-
-            return Value.Split<int>(',', out _).FirstOrDefault();
+            return Value.SplitAndConvert<int>(',', out _).FirstOrDefault();
         }
         if (string.IsNullOrEmpty(defaultValue))
         {
             return default;
         }
-        return defaultValue.Split<int>(',', out _).FirstOrDefault();
+        return defaultValue.SplitAndConvert<int>(',', out _).FirstOrDefault();
     }
 
     /// <summary>
@@ -33,17 +34,16 @@ public static class ConfigurationExtensions
     /// <returns>An array of integers</returns>
     private static int[] GetIntList(string Value, string? defaultValue = null)
     {
-
         if (!string.IsNullOrEmpty(Value))
         {
-            return Value.Split<int>(',', out _).ToArray() ?? Array.Empty<int>();
+            return Value.SplitAndConvert<int>(',', out _).ToArray() ?? Array.Empty<int>();
         }
 
         if (string.IsNullOrEmpty(defaultValue))
         {
             return Array.Empty<int>();
         }
-        return defaultValue.Split<int>(',', out _).ToArray() ?? Array.Empty<int>();
+        return defaultValue.SplitAndConvert<int>(',', out _).ToArray() ?? Array.Empty<int>();
     }
 
     /// <summary>
@@ -83,37 +83,6 @@ public static class ConfigurationExtensions
             return Array.Empty<string>();
         }
         return defaultValue.Split(",") ?? Array.Empty<string>();
-    }
-
-    /// <summary>
-    /// Splits a string by a separator and converts each element to the specified type
-    /// </summary>
-    /// <typeparam name="T">The target type to convert elements to</typeparam>
-    /// <param name="this">The input string to split</param>
-    /// <param name="separator">The character used to separate elements</param>
-    /// <param name="AllConverted">Output parameter indicating if all conversions were successful</param>
-    /// <returns>A list of converted elements</returns>
-    private static List<T> Split<T>(this string @this, char separator, out bool AllConverted)
-    {
-        List<T> returnVals = new();
-        AllConverted = true;
-        string[] itens = @this.Split(separator);
-        foreach (string item in itens)
-        {
-            try
-            {
-                returnVals.Add((T)Convert.ChangeType(item, typeof(T)));
-            }
-            catch (InvalidCastException) 
-            { 
-                AllConverted = false; 
-            }
-            catch (FormatException) 
-            { 
-                AllConverted = false; 
-            }
-        }
-        return returnVals;
     }
 
     /// <summary>

@@ -2,10 +2,14 @@
   "openapi": "3.1.1",
   "info": {
     "title": "UI Sample Spark API",
-    "description": "Employee management API for the UI Sample Spark educational project.\r\n\r\nDemonstrates ASP.NET Core MVC, Razor Pages, Blazor, React, Vue, and htmx\r\nalongside rate limiting, API key authentication, and RFC 7807 error responses.\r\n\r\n**Authentication:** Pass your API key in the `X-API-Key` request header.",
+    "description": "Employee management REST API for the UI Sample Spark educational project.\r\n\r\nDemonstrates ASP.NET Core minimal APIs alongside MVC, Razor Pages, Blazor,\r\nReact, Vue, and htmx — with per-IP rate limiting, API key authentication,\r\nand RFC 7807 ProblemDetails error responses.\r\n\r\n**Authentication:** All `/api/*` endpoints require an `X-API-Key` header.\r\nContact the site owner to obtain a valid key.",
     "contact": {
       "name": "Mark Hazleton",
       "url": "https://markhazleton.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/markhazleton/UISampleSpark/blob/main/LICENSE"
     },
     "version": "v1"
   },
@@ -19,30 +23,8 @@
           "200": {
             "description": "OK"
           }
-        }
-      }
-    },
-    "/status/explorer": {
-      "get": {
-        "tags": [
-          "Status"
-        ],
-        "summary": "Returns Current Application Status",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ApiExplorerModel"
-                  }
-                }
-              }
-            }
-          }
-        }
+        },
+        "security": [ ]
       }
     },
     "/status": {
@@ -50,10 +32,10 @@
         "tags": [
           "Status"
         ],
-        "summary": "Returns Current Application Status",
+        "operationId": "GetStatus",
         "responses": {
           "200": {
-            "description": "",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -62,257 +44,37 @@
               }
             }
           }
-        }
-      }
-    },
-    "/api/department": {
-      "get": {
-        "tags": [
-          "DepartmentApi"
-        ],
-        "summary": "Returns collection of all departments",
-        "parameters": [
-          {
-            "name": "includeEmployees",
-            "in": "query",
-            "description": "Whether to include employees in the response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Collection of departments",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DepartmentDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/department/{id}": {
-      "get": {
-        "tags": [
-          "DepartmentApi"
-        ],
-        "summary": "Returns a single department by identifier",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Department identifier",
-            "required": true,
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResource"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/employee/{id}": {
-      "delete": {
-        "tags": [
-          "EmployeeApi"
-        ],
-        "summary": "Deletes an employee by their unique identifier.",
-        "description": "Removes the employee record from the database. This operation cannot be undone.\r\nExample: DELETE /api/employee/1",
-        "operationId": "DeleteEmployee",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the employee to delete.",
-            "required": true,
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Employee successfully deleted.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Employee not found or could not be deleted.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResource"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "EmployeeApi"
-        ],
-        "summary": "Retrieves a single employee by their unique identifier.",
-        "description": "Returns the complete employee record including department information.\r\nExample: GET /api/employee/1",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the employee to retrieve.",
-            "required": true,
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Employee found and returned successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Employee with specified ID not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResource"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "EmployeeApi"
-        ],
-        "summary": "Updates an existing employee according to an identifier.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Employee identifier.",
-            "required": true,
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Cancellation token",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmployeeDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmployeeDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmployeeDto"
-              }
-            }
-          },
-          "required": true
         },
+        "security": [ ]
+      }
+    },
+    "/status/explorer": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "operationId": "GetApiExplorer",
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResource"
-                }
-              }
-            }
+            "description": "OK"
           }
-        }
+        },
+        "security": [ ]
       }
     },
     "/api/employee": {
       "get": {
         "tags": [
-          "EmployeeApi"
+          "Employee"
         ],
-        "summary": "Returns collection of all employees",
+        "summary": "List employees",
+        "description": "Returns a paged list of all employees. Use `PageNumber` and `PageSize` query parameters to navigate large result sets.",
+        "operationId": "ListEmployees",
         "parameters": [
           {
             "name": "PageNumber",
             "in": "query",
+            "description": "1-based page number. Defaults to 1.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -325,6 +87,7 @@
           {
             "name": "PageSize",
             "in": "query",
+            "description": "Records per page, 1–5,000. Defaults to 300.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -337,7 +100,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Collection of employees",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -348,42 +111,29 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
       "post": {
         "tags": [
-          "EmployeeApi"
+          "Employee"
         ],
-        "summary": "Creates a new employee.",
+        "summary": "Create employee",
+        "description": "Creates a new employee record and returns it with the server-assigned ID.",
+        "operationId": "CreateEmployee",
         "requestBody": {
-          "description": "Cancellation token",
           "content": {
             "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "null"
-                  },
-                  {
-                    "$ref": "#/components/schemas/EmployeeDto"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "null"
-                  },
-                  {
-                    "$ref": "#/components/schemas/EmployeeDto"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "oneOf": [
                   {
@@ -411,9 +161,321 @@
           "400": {
             "description": "Bad Request",
             "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employee/{id}": {
+      "get": {
+        "tags": [
+          "Employee"
+        ],
+        "summary": "Get employee by ID",
+        "description": "Returns the full employee record for the given numeric ID.",
+        "operationId": "GetEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique numeric identifier of the employee.",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResource"
+                  "$ref": "#/components/schemas/EmployeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Employee"
+        ],
+        "summary": "Update employee",
+        "description": "Replaces the employee record for the given ID with the supplied payload.",
+        "operationId": "UpdateEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique numeric identifier of the employee.",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Employee"
+        ],
+        "summary": "Delete employee",
+        "description": "Permanently removes the employee record with the given ID.",
+        "operationId": "DeleteEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique numeric identifier of the employee.",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/department": {
+      "get": {
+        "tags": [
+          "Department"
+        ],
+        "summary": "List departments",
+        "description": "Returns all departments. Set `includeEmployees=true` to embed the full employee list in each department object.",
+        "operationId": "ListDepartments",
+        "parameters": [
+          {
+            "name": "includeEmployees",
+            "in": "query",
+            "description": "When true, each department object includes its full employee roster.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DepartmentDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/department/{id}": {
+      "get": {
+        "tags": [
+          "Department"
+        ],
+        "summary": "Get department by ID",
+        "description": "Returns the department matching the given numeric ID. Optionally includes the employee roster via query parameter.",
+        "operationId": "GetDepartment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique numeric identifier of the department.",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -424,30 +486,6 @@
   },
   "components": {
     "schemas": {
-      "ApiDescriptionModel": {
-        "type": "object",
-        "properties": {
-          "relativePath": {
-            "type": "string"
-          }
-        },
-        "description": ""
-      },
-      "ApiExplorerModel": {
-        "type": "object",
-        "properties": {
-          "groupItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApiDescriptionModel"
-            }
-          },
-          "groupName": {
-            "type": "string"
-          }
-        },
-        "description": ""
-      },
       "ApplicationStatus": {
         "type": "object",
         "properties": {
@@ -647,22 +685,26 @@
           }
         }
       },
-      "ErrorResource": {
+      "EmployeeResponse": {
         "type": "object",
         "properties": {
-          "messages": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Messages"
+          "message": {
+            "type": "string"
+          },
+          "resource": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EmployeeDto"
+              }
+            ]
           },
           "success": {
-            "type": "boolean",
-            "description": "Success"
+            "type": "boolean"
           }
-        },
-        "description": "Error Resource"
+        }
       },
       "GenderEnum": {
         "type": "integer"
@@ -674,24 +716,75 @@
         ],
         "format": "binary"
       },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ServiceStatus": {
         "type": "integer",
         "default": 2
       }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "description": "API key for `/api/*` endpoints. Pass in the `X-API-Key` request header. Valid keys are configured in `ApiSecurity:ApiKeys` in app settings.",
+        "name": "X-API-Key",
+        "in": "header"
+      }
     }
   },
+  "security": [
+    {
+      "ApiKey": [ ]
+    }
+  ],
   "tags": [
     {
-      "name": "UISampleSpark.UI"
+      "name": "Employee",
+      "description": "Create, read, update, and delete employee records. All operations require a valid `X-API-Key` header."
     },
     {
-      "name": "Status"
+      "name": "Department",
+      "description": "Query departments and optionally include their employee rosters. All operations require a valid `X-API-Key` header."
     },
     {
-      "name": "DepartmentApi"
-    },
-    {
-      "name": "EmployeeApi"
+      "name": "Status",
+      "description": "Application health check, build version metadata, and live endpoint discovery. No authentication required."
     }
   ]
 }

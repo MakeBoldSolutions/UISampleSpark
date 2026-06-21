@@ -1,5 +1,5 @@
 ---
-description: Deprecated compatibility alias for /devspark.harvest
+description: Deprecated alias for /devspark.harvest — redirects to the canonical cleanup workflow
 handoffs:
   - label: Review Release Artifacts
     agent: devspark.release

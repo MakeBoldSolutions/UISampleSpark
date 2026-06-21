@@ -8,7 +8,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
     /// </summary>
     public class EditModel : PageModel
     {
-        private readonly EmployeeContext _context;
+        private readonly Core.Models.Data.EmployeeContext _context;
 
         /// <summary>
         /// Gets the list of gender options for the dropdown
@@ -19,7 +19,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
         /// Initializes a new instance of the <see cref="EditModel"/> class
         /// </summary>
         /// <param name="context">Database context for employee data</param>
-        public EditModel(EmployeeContext context)
+        public EditModel(Core.Models.Data.EmployeeContext context)
         {
             _context = context;
         }
@@ -28,7 +28,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
         /// Gets or sets the employee to be edited
         /// </summary>
         [BindProperty]
-        public Employee Employee { get; set; } = default!;
+        public Core.Models.Data.Employee Employee { get; set; } = default!;
 
         /// <summary>
         /// Handles GET requests to display the edit page
@@ -45,7 +45,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
             // Populate the Genders SelectList with the values from the Gender enum
             Genders = new SelectList(Enum.GetValues(typeof(GenderEnum)));
 
-            Employee? employee = await _context.Employees.FirstOrDefaultAsync(m => m.Id == id);
+            Core.Models.Data.Employee? employee = await _context.Employees.FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
                 return NotFound();

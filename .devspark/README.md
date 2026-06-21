@@ -6,6 +6,16 @@ This directory contains the **core deliverable** of DevSpark — prompt template
 
 Each file in `commands/` is a slash-command prompt (e.g., `/devspark.specify`, `/devspark.plan`). When you run `devspark init`, stock prompts are deployed to `.devspark/defaults/commands/`. AI shims then resolve prompts via the 3-tier order: personal override, team override, then stock default.
 
+Terminology used by these templates:
+
+- **Prompt** files are DevSpark workflow command surfaces.
+- **Agents** are AI runtime or client integrations that execute prompts.
+- **Skills** are portable capability packages prompts may delegate to.
+- **Participants** are human or AI-filled team members responsible for work,
+  review, critique, approval, or decision capture.
+- **Roles** are responsibility labels for participants, such as owner, planner,
+  implementer, reviewer, critic, or scribe.
+
 DevSpark ownership is strictly two-tier:
 
 - `.devspark/` is framework-managed stock content
@@ -58,3 +68,9 @@ The collection includes 27 active commands plus 1 deprecated compatibility alias
 | `spec-validation-contract.md` | Shared validation contract for spec structure and required content |
 | `agent-file-template.md` | Template for agent configuration files |
 | `vscode-settings.json` | Recommended VS Code settings |
+
+The stock spec, quick-spec, plan, and tasks templates include optional
+`participants` YAML frontmatter examples. This metadata is advisory
+responsibility context only. It is not required for existing artifacts, does
+not affect prompt or script resolution, and does not change command output.
+Customization layers and precedence are unchanged.

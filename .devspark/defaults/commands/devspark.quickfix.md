@@ -17,6 +17,18 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Workflow Position
+
+Alternative entry point to authoring: `[user request] → route decision → { specify → clarify → plan → tasks | quickfix } → implement`. Use **instead of** `/devspark.specify` for bug fixes, config tweaks, docs updates, hotfixes, or minor features under ~4 hours. `/devspark.specify` recommends this command automatically for `one-off-fix` classification.
+
+- **Owns**: classification, targeted constitution check, lightweight change record (`QF-YYYY-NNN`), and gate acknowledgement of any unresolved concerns.
+- **Does NOT own**: multi-file architectural changes, new user-facing features, or API/schema changes (→ `/devspark.specify`); interactive ambiguity resolution (→ `/devspark.clarify`); design artifacts (→ `/devspark.plan`); story-organized task lists (→ `/devspark.tasks`); adversarial risk review (→ `/devspark.critic`, `/devspark.analyze`).
+- **If scope expands during implementation**: halt and recommend `/devspark.specify {original problem}` rather than stretching the quickfix.
+
+## Constitution Authority
+
+`/.documentation/memory/constitution.md` is **required** — if missing, halt and direct the user to `/devspark.constitution`. The targeted constitution check (§5) loads only principles relevant to the detected classification, but they remain non-negotiable: a FAIL must be surfaced and acknowledged in writing, never silently ignored.
+
 ## Overview
 
 This command enables rapid fixes for bug fixes, small features, and production issues without the overhead of full specification workflows. It validates changes against relevant constitution sections and generates a lightweight change record.
@@ -42,11 +54,11 @@ Gate results from this workflow are advisory. The agent must surface blocking co
 
 Parse `$ARGUMENTS` for action type:
 
-| Action | Trigger | Description |
-|--------|---------|-------------|
-| `create` | Default (description provided) | Create new quickfix record |
+| Action     | Trigger                                   | Description                |
+| ---------- | ----------------------------------------- | -------------------------- |
+| `create`   | Default (description provided)            | Create new quickfix record |
 | `complete` | `/devspark.quickfix complete QF-YYYY-NNN` | Mark quickfix as completed |
-| `list` | `/devspark.quickfix list` | Show recent quickfixes |
+| `list`     | `/devspark.quickfix list`                 | Show recent quickfixes     |
 
 ## Outline
 
@@ -92,11 +104,11 @@ If ACTION is "list":
 ```markdown
 ## Recent Quickfixes
 
-| ID | Date | Classification | Status | Description |
-|----|------|----------------|--------|-------------|
-| QF-2026-003 | 2026-02-01 | bug-fix | Completed | Fix null pointer in UserService |
-| QF-2026-002 | 2026-01-28 | hotfix | Completed | Payment timeout fix |
-| QF-2026-001 | 2026-01-25 | config-change | Completed | Update rate limits |
+| ID          | Date       | Classification | Status    | Description                     |
+| ----------- | ---------- | -------------- | --------- | ------------------------------- |
+| QF-2026-003 | 2026-02-01 | bug-fix        | Completed | Fix null pointer in UserService |
+| QF-2026-002 | 2026-01-28 | hotfix         | Completed | Payment timeout fix             |
+| QF-2026-001 | 2026-01-25 | config-change  | Completed | Update rate limits              |
 ```
 
 1. Stop execution (no record creation)
@@ -123,13 +135,13 @@ Continue to step 3 for creating new quickfix record.
 
 Based on CLASSIFICATION from script:
 
-| Classification | Keywords Detected | Max Effort | Risk |
-|---------------|-------------------|------------|------|
-| `hotfix` | urgent, critical, emergency, production | 2 hours | HIGH |
-| `bug-fix` | fix, bug, error, crash, broken, issue | 4 hours | MEDIUM |
-| `config-change` | config, setting, environment, flag | 1 hour | LOW |
-| `docs-update` | doc, readme, comment, documentation | 2 hours | LOW |
-| `minor-feature` | (default) | 4 hours | LOW |
+| Classification  | Keywords Detected                       | Max Effort | Risk   |
+| --------------- | --------------------------------------- | ---------- | ------ |
+| `hotfix`        | urgent, critical, emergency, production | 2 hours    | HIGH   |
+| `bug-fix`       | fix, bug, error, crash, broken, issue   | 4 hours    | MEDIUM |
+| `config-change` | config, setting, environment, flag      | 1 hour     | LOW    |
+| `docs-update`   | doc, readme, comment, documentation     | 2 hours    | LOW    |
+| `minor-feature` | (default)                               | 4 hours    | LOW    |
 
 **Scope Warning:**
 
@@ -139,6 +151,7 @@ If the description suggests work beyond the classification limits, warn:
 Scope Warning: This appears to be a larger change than a typical {CLASSIFICATION}.
 
 Consider upgrading to a full specification:
+
 - Run `/devspark.specify {description}` for proper planning
 - Or continue with quickfix if you're confident it's small
 ```
@@ -147,13 +160,13 @@ Consider upgrading to a full specification:
 
 Read `/.documentation/memory/constitution.md` and extract only principles relevant to the change type:
 
-| Classification | Relevant Principles |
-|---------------|---------------------|
-| `hotfix` | Security, Observability, Deployment |
-| `bug-fix` | Testing, Code Quality, Security |
-| `config-change` | Security, Documentation |
-| `docs-update` | Documentation |
-| `minor-feature` | All MUST principles |
+| Classification  | Relevant Principles                 |
+| --------------- | ----------------------------------- |
+| `hotfix`        | Security, Observability, Deployment |
+| `bug-fix`       | Testing, Code Quality, Security     |
+| `config-change` | Security, Documentation             |
+| `docs-update`   | Documentation                       |
+| `minor-feature` | All MUST principles                 |
 
 Build a targeted validation checklist from these principles only.
 
@@ -190,11 +203,11 @@ Create record at `QUICKFIX_DIR/NEXT_ID.md`:
 ```markdown
 ---
 classification: one-off-fix
-risk_level: {RISK_LEVEL}
+risk_level: { RISK_LEVEL }
 target_workflow: quickfix
 required_artifacts: quickfix-record
 recommended_next_step: implement
-required_gates: {Leave blank for low risk; otherwise checklist}
+required_gates: { Leave blank for low risk; otherwise checklist }
 ---
 
 # Quickfix Record: {NEXT_ID}
@@ -224,10 +237,10 @@ required_gates: {Leave blank for low risk; otherwise checklist}
 
 ## Constitution Compliance
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
+| Principle              | Status           | Notes                  |
+| ---------------------- | ---------------- | ---------------------- |
 | {Relevant Principle 1} | PASS/CONDITIONAL | {Notes if conditional} |
-| {Relevant Principle 2} | PASS/CONDITIONAL | {Notes} |
+| {Relevant Principle 2} | PASS/CONDITIONAL | {Notes}                |
 
 ## Validation Checklist
 
@@ -252,7 +265,7 @@ required_gates: {Leave blank for low risk; otherwise checklist}
 
 ---
 
-*Generated by /devspark.quickfix v1.0*
+_Generated by /devspark.quickfix v1.0_
 ```
 
 ### 8. Output Summary
@@ -317,15 +330,15 @@ This ensures proper planning and documentation for larger changes.
 
 ### Quickfix vs Full Spec Decision Guide
 
-| Scenario | Recommendation |
-|----------|----------------|
-| Single file change, < 50 lines | Quickfix |
-| Bug with clear root cause | Quickfix |
-| Production issue needing rapid fix | Quickfix (hotfix) |
-| Multiple files, architectural impact | Full Spec |
-| New user-facing feature | Full Spec |
-| Database schema changes | Full Spec |
-| API contract changes | Full Spec |
+| Scenario                             | Recommendation    |
+| ------------------------------------ | ----------------- |
+| Single file change, < 50 lines       | Quickfix          |
+| Bug with clear root cause            | Quickfix          |
+| Production issue needing rapid fix   | Quickfix (hotfix) |
+| Multiple files, architectural impact | Full Spec         |
+| New user-facing feature              | Full Spec         |
+| Database schema changes              | Full Spec         |
+| API contract changes                 | Full Spec         |
 
 ### Error Handling
 
@@ -353,6 +366,7 @@ High-Risk Quickfix Warning
 This has been classified as a hotfix with HIGH risk level.
 
 Before proceeding:
+
 - [ ] Confirm this is truly urgent
 - [ ] Identify rollback plan if fix fails
 - [ ] Notify team of incoming production change

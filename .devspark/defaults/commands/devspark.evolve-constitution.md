@@ -17,6 +17,14 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Lifecycle Position
+
+Continuous-improvement step: `PR reviews + audits → evolve-constitution → CAP-YYYY-NNN.md (DRAFT) → approve/reject → /devspark.constitution applies APPROVED CAPs`. Runs *after* a constitution exists, *between* version bumps.
+
+- **Owns**: pattern analysis across PR reviews and audits, gap detection, drafting Constitution Amendment Proposals (CAPs), and recording approve/reject decisions in `proposals/` and history.
+- **Does NOT own**: editing `constitution.md` (only `/devspark.constitution` writes it — this command always emits a *proposal* file); bootstrapping (→ `/devspark.discover-constitution` brownfield, `/devspark.constitution` greenfield); performing the reviews themselves (→ `/devspark.pr-review`, `/devspark.site-audit`).
+- **Prerequisite**: if `/.documentation/memory/constitution.md` does not exist, halt and route to `/devspark.discover-constitution` (brownfield) or `/devspark.constitution` (greenfield). Never propose against a non-existent constitution.
+
 ## Overview
 
 This command facilitates constitution evolution by:
@@ -39,12 +47,12 @@ This command facilitates constitution evolution by:
 
 Parse `$ARGUMENTS` for action type:
 
-| Action | Trigger | Description |
-|--------|---------|-------------|
-| `analyze` | Default | Analyze reviews/audits and propose amendments |
-| `suggest` | `/devspark.evolve-constitution suggest "..."` | Create proposal from manual suggestion |
-| `approve` | `/devspark.evolve-constitution approve CAP-YYYY-NNN` | Approve a proposal |
-| `reject` | `/devspark.evolve-constitution reject CAP-YYYY-NNN "reason"` | Reject a proposal |
+| Action    | Trigger                                                      | Description                                   |
+| --------- | ------------------------------------------------------------ | --------------------------------------------- |
+| `analyze` | Default                                                      | Analyze reviews/audits and propose amendments |
+| `suggest` | `/devspark.evolve-constitution suggest "..."`                | Create proposal from manual suggestion        |
+| `approve` | `/devspark.evolve-constitution approve CAP-YYYY-NNN`         | Approve a proposal                            |
+| `reject`  | `/devspark.evolve-constitution reject CAP-YYYY-NNN "reason"` | Reject a proposal                             |
 
 ## Outline
 
@@ -159,11 +167,11 @@ For each PR review file:
 **Build Pattern Summary:**
 
 ```markdown
-| Principle | Violations | PRs Affected | Trend |
-|-----------|------------|--------------|-------|
-| Security | 15 | pr-45, pr-67, pr-89 | ↑ Increasing |
-| Testing | 8 | pr-23, pr-56 | → Stable |
-| (Uncategorized) | 5 | pr-12, pr-34 | New |
+| Principle       | Violations | PRs Affected        | Trend        |
+| --------------- | ---------- | ------------------- | ------------ |
+| Security        | 15         | pr-45, pr-67, pr-89 | ↑ Increasing |
+| Testing         | 8          | pr-23, pr-56        | → Stable     |
+| (Uncategorized) | 5          | pr-12, pr-34        | New          |
 ```
 
 **Identify Uncategorized Issues:**
@@ -188,23 +196,23 @@ Scan audit reports in `AUDIT_DIR`:
 
 Compare findings against constitution:
 
-| Finding | Status |
-|---------|--------|
-| Issues with no matching principle | **Potential new principle** |
-| Principles with zero violations | Potentially redundant or well-followed |
-| Principles with 5+ violations | May need clarification |
-| New violation categories emerging | Evolution trigger |
+| Finding                           | Status                                 |
+| --------------------------------- | -------------------------------------- |
+| Issues with no matching principle | **Potential new principle**            |
+| Principles with zero violations   | Potentially redundant or well-followed |
+| Principles with 5+ violations     | May need clarification                 |
+| New violation categories emerging | Evolution trigger                      |
 
 ### 4. Evolution Threshold Check
 
 Generate proposals only when patterns meet thresholds:
 
-| Trigger | Threshold | Action |
-|---------|-----------|--------|
-| Recurring violations | 3+ PRs with same issue | Propose clarification |
-| Uncategorized issues | 3+ instances | Propose new principle |
-| Critical findings | Any uncovered critical | High-priority proposal |
-| Manual suggestion | Always | Create proposal |
+| Trigger              | Threshold              | Action                 |
+| -------------------- | ---------------------- | ---------------------- |
+| Recurring violations | 3+ PRs with same issue | Propose clarification  |
+| Uncategorized issues | 3+ instances           | Propose new principle  |
+| Critical findings    | Any uncovered critical | High-priority proposal |
+| Manual suggestion    | Always                 | Create proposal        |
 
 If no patterns meet thresholds:
 
@@ -214,16 +222,19 @@ If no patterns meet thresholds:
 No constitution amendments recommended at this time.
 
 **Analysis Summary:**
+
 - PR Reviews Analyzed: {N}
 - Audit Reports Analyzed: {M}
 - Patterns Meeting Threshold: 0
 
 **Current State:**
+
 - Constitution compliance appears healthy
 - No recurring uncategorized issues detected
 - Existing principles cover observed patterns
 
 **Recommendations:**
+
 - Continue monitoring with regular PR reviews
 - Run `/devspark.site-audit` for comprehensive compliance check
 - Revisit evolution analysis after 10+ more PR reviews
@@ -254,6 +265,7 @@ Ensure directory exists: Create `/.documentation/memory/proposals/` if missing.
 ## Amendment Type
 
 Select one:
+
 - [ ] **ADD** - New principle
 - [ ] **MODIFY** - Update existing principle
 - [ ] **DEPRECATE** - Remove or soften principle
@@ -270,10 +282,10 @@ Select one:
 
 {Summary of findings that triggered this proposal}
 
-| Source | Finding | Count |
-|--------|---------|-------|
+| Source     | Finding             | Count           |
+| ---------- | ------------------- | --------------- |
 | PR Reviews | {issue description} | {N} occurrences |
-| Audits | {finding} | {M} reports |
+| Audits     | {finding}           | {M} reports     |
 
 ### Specific Examples
 
@@ -292,10 +304,12 @@ Select one:
 **Rationale**: {Why this principle is needed based on evidence}
 
 **MUST Requirements:**
+
 - {Specific requirement 1}
 - {Specific requirement 2}
 
 **SHOULD Recommendations:**
+
 - {Recommended practice}
 
 ## Impact Assessment
@@ -308,14 +322,14 @@ Select one:
 
 ### Compliance Effort
 
-| Current Compliance | Remediation Effort | Timeline |
-|--------------------|-------------------|----------|
-| ~{X}% | {LOW/MEDIUM/HIGH} | {estimate} |
+| Current Compliance | Remediation Effort | Timeline   |
+| ------------------ | ------------------ | ---------- |
+| ~{X}%              | {LOW/MEDIUM/HIGH}  | {estimate} |
 
 ### Risk Analysis
 
-| If Adopted | If Rejected |
-|------------|-------------|
+| If Adopted            | If Rejected        |
+| --------------------- | ------------------ |
 | {Potential downsides} | {Continued issues} |
 
 ## Adoption Plan
@@ -339,12 +353,14 @@ Select one:
 - [ ] Evidence justifies the change
 - [ ] Impact assessment is realistic
 - [ ] Adoption plan is achievable
+- [ ] If the amendment adds, removes, or modifies a severity marker, `.documentation/memory/severity-registry.md` is updated in the same PR (FR-009)
+- [ ] Check whether the amendment implies new governance limitations; if so, update `.documentation/memory/known-limitations.md` in the same PR (FR-006)
 
 ## Voting Record
 
-| Reviewer | Vote | Date | Comments |
-|----------|------|------|----------|
-| (pending review) | | | |
+| Reviewer         | Vote | Date | Comments |
+| ---------------- | ---- | ---- | -------- |
+| (pending review) |      |      |          |
 
 ## Resolution
 
@@ -354,8 +370,8 @@ Select one:
 
 ---
 
-*Generated by /devspark.evolve-constitution v1.0*
-*Review period: 14 days from creation*
+_Generated by /devspark.evolve-constitution v1.0_
+_Review period: 14 days from creation_
 ```
 
 ### 6. Update History File
@@ -372,25 +388,25 @@ Create or update `/.documentation/memory/constitution-history.md`:
 
 ## Pending Proposals
 
-| CAP ID | Created | Type | Principle | Status | Review Due |
-|--------|---------|------|-----------|--------|------------|
-| {NEXT_CAP_ID} | {date} | {ADD/MODIFY} | {name} | DRAFT | {date + 14 days} |
+| CAP ID        | Created | Type         | Principle | Status | Review Due       |
+| ------------- | ------- | ------------ | --------- | ------ | ---------------- |
+| {NEXT_CAP_ID} | {date}  | {ADD/MODIFY} | {name}    | DRAFT  | {date + 14 days} |
 
 ## Amendment Log
 
-| Version | Date | Type | Principle | CAP ID | Status |
-|---------|------|------|-----------|--------|--------|
+| Version                                    | Date | Type | Principle | CAP ID | Status |
+| ------------------------------------------ | ---- | ---- | --------- | ------ | ------ |
 | (entries added as amendments are approved) |
 
 ## Rejected Proposals
 
-| CAP ID | Date | Principle | Reason |
-|--------|------|-----------|--------|
+| CAP ID                                    | Date | Principle | Reason |
+| ----------------------------------------- | ---- | --------- | ------ |
 | (entries added as proposals are rejected) |
 
 ---
 
-*Maintained by /devspark.evolve-constitution*
+_Maintained by /devspark.evolve-constitution_
 ```
 
 ### 7. Output Summary
@@ -400,23 +416,24 @@ Create or update `/.documentation/memory/constitution-history.md`:
 
 **Analysis Period**: {earliest PR date} to {latest PR date}
 **Data Sources**:
+
 - PR Reviews: {N} analyzed
 - Audit Reports: {M} analyzed
 - Constitution Version: {VERSION}
 
 ### Findings Summary
 
-| Category | Count | Trend |
-|----------|-------|-------|
-| Critical Issues | {N} | {trend} |
-| High Issues | {M} | {trend} |
-| Uncategorized | {P} | {trend} |
+| Category        | Count | Trend   |
+| --------------- | ----- | ------- |
+| Critical Issues | {N}   | {trend} |
+| High Issues     | {M}   | {trend} |
+| Uncategorized   | {P}   | {trend} |
 
 ### Proposals Generated
 
-| CAP ID | Type | Principle | Priority |
-|--------|------|-----------|----------|
-| {NEXT_CAP_ID} | ADD | {name} | HIGH |
+| CAP ID        | Type | Principle | Priority |
+| ------------- | ---- | --------- | -------- |
+| {NEXT_CAP_ID} | ADD  | {name}    | HIGH     |
 
 ### Proposal Details
 
@@ -462,12 +479,12 @@ Proposals should be:
 
 ### Amendment Types
 
-| Type | Use When | Example |
-|------|----------|---------|
-| ADD | New area needs coverage | "API Versioning" principle |
-| MODIFY | Existing principle unclear | Clarify testing requirements |
-| DEPRECATE | Principle no longer relevant | Remove outdated standard |
-| CLARIFY | Add examples only | Add code examples to existing |
+| Type      | Use When                     | Example                       |
+| --------- | ---------------------------- | ----------------------------- |
+| ADD       | New area needs coverage      | "API Versioning" principle    |
+| MODIFY    | Existing principle unclear   | Clarify testing requirements  |
+| DEPRECATE | Principle no longer relevant | Remove outdated standard      |
+| CLARIFY   | Add examples only            | Add code examples to existing |
 
 ### Voting Process
 
@@ -507,6 +524,7 @@ Insufficient Data for Evolution Analysis
 No PR reviews found in /.documentation/specs/pr-review/
 
 To build analysis data:
+
 1. Run `/devspark.pr-review` on recent PRs
 2. Accumulate 5+ reviews for meaningful patterns
 3. Retry `/devspark.evolve-constitution`
@@ -521,6 +539,7 @@ Or create manual proposal:
 Cannot perform evolution analysis - Constitution required
 
 Create a constitution first:
+
 1. Run: /devspark.constitution
 2. Define your project's core principles
 3. Run PR reviews to build compliance data

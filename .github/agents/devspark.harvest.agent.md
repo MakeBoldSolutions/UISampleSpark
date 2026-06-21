@@ -1,12 +1,12 @@
 ---
-description: Canonical knowledge-preserving cleanup workflow for completed specs, stale docs, comment cleanup, and archival
+description: Post-release cleanup — preserve knowledge into living docs, rewrite spec-linked code comments, and move stale artifacts to /.archive/
 handoffs:
-  - label: Review Release Artifacts
-    agent: devspark.release
-    prompt: Review completed specs and release documentation before archival
   - label: Run Documentation Audit
     agent: devspark.site-audit
-    prompt: Audit documentation quality and stale references before harvest
+    prompt: Audit documentation quality and stale references after harvest
+  - label: Run Release First
+    agent: devspark.release
+    prompt: Seal the release and archive completed specs before running harvest
 ---
 
 ## Prompt Resolution

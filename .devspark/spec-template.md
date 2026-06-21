@@ -5,6 +5,13 @@ target_workflow: specify-full
 required_artifacts: spec, plan, tasks
 recommended_next_step: plan
 required_gates: checklist, analyze, critic
+participants:
+  owner: human
+  planner: ai
+  implementer: ai
+  reviewer: human
+  critic: ai
+  scribe: ai
 ---
 
 # Feature Specification: [FEATURE NAME]

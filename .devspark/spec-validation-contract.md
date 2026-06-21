@@ -16,6 +16,13 @@ target_workflow: specify-light | specify-full
 required_artifacts: intent, action-plan | spec, plan, tasks
 recommended_next_step: plan | clarify | implement
 required_gates: checklist | checklist, analyze, critic
+participants:
+  owner: human
+  planner: ai
+  implementer: ai
+  reviewer: human
+  critic: ai
+  scribe: ai
 ```
 
 Validation rules:
@@ -24,7 +31,14 @@ Validation rules:
 - `quick-spec` maps to `specify-light` and `intent, action-plan`.
 - `full-spec` maps to `specify-full` and `spec, plan, tasks`.
 - `required_gates` MUST match the chosen route unless the spec explicitly documents why additional gates were added.
+- `participants` is optional advisory metadata. Its absence must not fail
+  validation, block a workflow, alter prompt resolution, alter script
+  resolution, or change command output.
 - If frontmatter conflicts with body prose, treat frontmatter as authoritative and either repair the prose or flag the inconsistency.
+
+Participant examples should use role-to-kind values such as `owner: human` or
+`implementer: ai`. Stock examples must avoid personally identifying information.
+Teams that add display labels own their own privacy handling.
 
 ## 2. Lifecycle State Contract
 
@@ -130,3 +144,10 @@ When validation fails:
 - If a missing or malformed item can be repaired directly from route metadata or obvious existing content, repair it.
 - If classification or required section intent cannot be inferred safely, stop and ask the user to rerun `/devspark.specify` or repair the spec manually.
 - Never silently drop user-authored requirements to make the document fit the contract.
+
+## 7. Participant Metadata Non-Goals
+
+Participant metadata is silent artifact-only context in this phase. It must not
+create workflow dispatch behavior, a participant registry, reviewer lockout,
+metadata-based inheritance, metadata-based customization precedence, or a
+dedicated command-output summary.

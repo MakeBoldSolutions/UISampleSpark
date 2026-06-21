@@ -1,6 +1,6 @@
 ---
 description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
-handoffs: 
+handoffs:
   - label: Build Specification
     agent: devspark.specify
     prompt: Implement the feature specification based on the updated constitution. I want to build...
@@ -14,6 +14,34 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Lifecycle Position
+
+**Single writer of record** for `/.documentation/memory/constitution.md`. Two siblings feed in but never edit the constitution themselves:
+
+- `/devspark.discover-constitution` (brownfield bootstrap) → produces `constitution-draft.md`
+- `/devspark.evolve-constitution` (continuous improvement) → produces APPROVED CAPs in `proposals/`
+- Direct human edits via this command
+
+All three paths converge here → this command writes `constitution.md` and bumps the version.
+
+- **Owns**: collecting placeholder values, semver decisions, writing the constitution file, propagating impact to dependent templates, emitting the Sync Impact Report.
+- **Does NOT own**: reverse-engineering principles (→ `/devspark.discover-constitution`); generating amendment proposals (→ `/devspark.evolve-constitution`); reviewing/voting on proposals (out-of-band; this command only *applies* approved ones).
+
+## Upstream Inputs to Check
+
+Before drafting, scan for upstream artifacts produced by the sibling commands and incorporate them when present:
+
+1. **Discovery draft** — if `/.documentation/memory/constitution-draft.md` exists:
+   - Treat it as the starting point for placeholder values when no constitution exists yet.
+   - After successfully writing `constitution.md`, archive the draft to `/.documentation/memory/archive/constitution-draft-YYYY-MM-DD.md` so it isn't reapplied.
+2. **Approved amendment proposals** — if `/.documentation/memory/proposals/` contains files whose `Status: APPROVED`:
+   - List them to the user; for each, ask whether to apply now in this version bump.
+   - For every applied CAP, update its `Resolution.Applied in Version` field to the new constitution version and move the file to `proposals/applied/`.
+   - Reflect each applied CAP in the Sync Impact Report (§5) under a new "Applied Amendments" block (CAP ID → principle change).
+3. **Rejected or pending proposals**: leave untouched. Never silently roll a non-approved proposal into the constitution.
+
+If neither upstream artifact is present, proceed with user-supplied input as today.
+
 ## Outline
 
 You are updating the project constitution at `/.documentation/memory/constitution.md`. This file is a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`, `[PRINCIPLE_1_NAME]`). Your job is to (a) collect/derive concrete values, (b) fill the template precisely, and (c) propagate any amendments across dependent artifacts.
@@ -22,7 +50,7 @@ Follow this execution flow:
 
 1. Load the existing constitution template at `/.documentation/memory/constitution.md`.
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
-   **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
+     **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
 
 2. Collect/derive values for placeholders:
    - If user input (conversation) supplies a value, use it.

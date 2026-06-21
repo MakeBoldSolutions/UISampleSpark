@@ -1,6 +1,6 @@
 ---
 description: Analyze existing codebase to discover implicit patterns and conventions, then guide user through crafting a constitution via interactive questioning.
-handoffs: 
+handoffs:
   - label: Create Constitution
     agent: devspark.constitution
     prompt: Formalize the discovered principles into the constitution template

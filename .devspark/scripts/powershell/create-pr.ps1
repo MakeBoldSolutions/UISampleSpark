@@ -338,8 +338,36 @@ function Get-CreatePrPreflight {
         }
     } catch { }
     $linesSummary = (git diff --shortstat $diffRef 2>$null) -join ''
-    $changedFiles = @(git diff --name-only $diffRef 2>$null)
-    $recentCommits = @(git log --format='%s' -n 10 $diffRef 2>$null)
+    $fileChanges = @(
+        git diff --name-status $diffRef 2>$null |
+        ForEach-Object {
+            if ($_ -and $_ -match "`t") {
+                $parts = $_ -split "`t"
+                if ($parts.Count -ge 2) {
+                    $st = $parts[0].Substring(0, 1)
+                    if ($parts.Count -ge 3) {
+                        [PSCustomObject]@{ status = $st; path = $parts[2].Trim(); from = $parts[1].Trim() }
+                    } else {
+                        [PSCustomObject]@{ status = $st; path = $parts[1].Trim() }
+                    }
+                }
+            }
+        } | Where-Object { $_ -ne $null }
+    )
+    $commitLog = @(
+        git log --format="%H`u{001f}%s`u{001f}%an`u{001f}%ai" -n 20 $diffRef 2>$null |
+        ForEach-Object {
+            $parts = $_ -split "`u{001f}"
+            if ($parts.Count -ge 4) {
+                [PSCustomObject]@{
+                    hash    = $parts[0].Trim()
+                    subject = $parts[1].Trim()
+                    author  = $parts[2].Trim()
+                    date    = $parts[3].Trim()
+                }
+            }
+        } | Where-Object { $_ -ne $null }
+    )
 
     $existingPr = [PSCustomObject]@{ exists = $false; number = $null; url = ''; title = ''; state = ''; draft = $false }
     if ($cliAvailable -and $authOk) {
@@ -402,9 +430,10 @@ function Get-CreatePrPreflight {
             gate_acknowledgements = @($gateAcknowledgements)
         }
         diff = [PSCustomObject]@{
-            changed_files_count = $changedFiles.Count
-            lines_summary = $linesSummary
-            recent_commit_subjects = $recentCommits
+            changed_files_count = $fileChanges.Count
+            lines_summary       = $linesSummary
+            commit_log          = $commitLog
+            file_changes        = $fileChanges
         }
         quickfix_record = $quickfixRecord
         existing_pr = $existingPr

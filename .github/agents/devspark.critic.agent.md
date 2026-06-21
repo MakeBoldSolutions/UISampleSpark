@@ -1,6 +1,10 @@
 ---
-description: Perform adversarial risk analysis identifying technical flaws, implementation hazards, and failure modes across spec.md, plan.md, and tasks.md.
+description: Perform adversarial, archetype-aware risk analysis across spec.md, plan.md, and tasks.md — identifying flaws, hazards, and failure modes that will derail delivery in production.
 handoffs:
+  - label: Fix Spec Showstoppers
+    agent: devspark.specify
+    prompt: Revise spec to resolve vague requirements, missing edge cases, or undefined trust boundaries
+    send: true
   - label: Fix Critical Issues
     agent: devspark.plan
     prompt: Revise plan to address critical architectural risks

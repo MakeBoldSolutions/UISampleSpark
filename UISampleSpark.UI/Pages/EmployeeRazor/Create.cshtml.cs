@@ -10,13 +10,13 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
     /// </summary>
     public class CreateModel : PageModel
     {
-        private readonly EmployeeContext _context;
+        private readonly Core.Models.Data.EmployeeContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateModel"/> class
         /// </summary>
         /// <param name="context">Database context for employee data</param>
-        public CreateModel(EmployeeContext context)
+        public CreateModel(Core.Models.Data.EmployeeContext context)
         {
             _context = context;
         }
@@ -35,7 +35,7 @@ namespace UISampleSpark.UI.Pages.EmployeeRazor
         /// Gets or sets the employee entity to be created
         /// </summary>
         [BindProperty]
-        public Employee Employee { get; set; } = default!;
+        public Core.Models.Data.Employee Employee { get; set; } = default!;
 
 
         /// <summary>
