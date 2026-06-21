@@ -1,5 +1,12 @@
 ---
 description: "Task list template for feature implementation"
+participants:
+  owner: human
+  planner: ai
+  implementer: ai
+  reviewer: human
+  critic: ai
+  scribe: ai
 ---
 
 # Tasks: [FEATURE NAME]

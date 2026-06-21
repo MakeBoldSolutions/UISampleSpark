@@ -145,6 +145,14 @@ if (-not $ToDate) {
 
 $rangeSpec = if ($BaseRef) { "$BaseRef..$HeadRef" } else { $HeadRef }
 
+$baseSha = if ($BaseRef) {
+    $resolved = @(Invoke-GitSafe @('rev-parse', '--verify', $BaseRef))
+    if ($resolved.Count -gt 0) { "$($resolved[0])".Trim() } else { '' }
+} else { '' }
+
+$headSha = @(Invoke-GitSafe @('rev-parse', '--verify', $HeadRef))
+$headSha = if ($headSha.Count -gt 0) { "$($headSha[0])".Trim() } else { '' }
+
 $commitArgs = @('log', '--date=iso-strict', '--pretty=format:%H%x09%h%x09%ad%x09%an%x09%s')
 if ($FromDate) { $commitArgs += "--since=$FromDate`T00:00:00" }
 if ($ToDate) { $commitArgs += "--until=$ToDate`T23:59:59" }
@@ -337,7 +345,9 @@ $prReviewSummary = [ordered]@{
 $result = [ordered]@{
     REPO_ROOT              = $repoRoot
     BASE_REF               = $BaseRef
+    BASE_SHA               = $baseSha
     HEAD_REF               = $HeadRef
+    HEAD_SHA               = $headSha
     RANGE_SPEC             = $rangeSpec
     RELEASE_FROM           = $FromDate
     RELEASE_TO             = $ToDate
@@ -361,6 +371,8 @@ if ($Json) {
     Write-Output '======================='
     Write-Output "Repository: $repoRoot"
     Write-Output "Range: $rangeSpec"
+    if ($baseSha) { Write-Output "Base SHA: $baseSha" }
+    Write-Output "Head SHA: $headSha"
     Write-Output "Release Window: $FromDate -> $ToDate"
     Write-Output "Commits: $($commits.Count)"
     Write-Output "Merged PRs: $(@($mergedPrNumbers).Count)"

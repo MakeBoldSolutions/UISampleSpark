@@ -20,6 +20,8 @@ param(
     [switch]$RequireTasks,
     [switch]$IncludeTasks,
     [switch]$PathsOnly,
+    [switch]$RequireDeliveryStatus,
+    [int]$TimeoutSeconds = 300,
     [switch]$Help
 )
 
@@ -37,6 +39,8 @@ OPTIONS:
   -RequireTasks       Require tasks.md to exist (for implementation phase)
   -IncludeTasks       Include tasks.md in AVAILABLE_DOCS list
   -PathsOnly          Only output path variables (no prerequisite validation)
+    -RequireDeliveryStatus  Require latest harness run to be create-pr ready
+    -TimeoutSeconds     Timeout value reported in diagnostics (default: 300)
   -Help, -h           Show this help message
 
 EXAMPLES:
@@ -48,6 +52,9 @@ EXAMPLES:
   
   # Get feature paths only (no validation)
   .\check-prerequisites.ps1 -PathsOnly
+
+    # Enforce delivery gate for create-pr/pr-review transitions
+    .\check-prerequisites.ps1 -Json -RequireDeliveryStatus -TimeoutSeconds 300
 
 "@
     exit 0
@@ -108,6 +115,25 @@ if ($RequireTasks -and -not (Test-Path $paths.TASKS -PathType Leaf)) {
     Write-Output "ERROR: tasks.md not found in $($paths.FEATURE_DIR)"
     Write-Output "Run /devspark.tasks first to create the task list."
     exit 1
+}
+
+if ($RequireDeliveryStatus) {
+    $runsRoot = Join-Path $paths.REPO_ROOT ".documentation/devspark/runs"
+    if (Test-Path $runsRoot -PathType Container) {
+        $latest = Get-ChildItem -Path $runsRoot -Directory -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($latest) {
+            $resultPath = Join-Path $latest.FullName "result.json"
+            if (Test-Path $resultPath -PathType Leaf) {
+                $result = Get-Content $resultPath -Raw | ConvertFrom-Json
+                if (-not $result.create_pr_ready) {
+                    Write-Output "ERROR: delivery-status gate failed; latest harness run is not create-pr ready"
+                    exit 1
+                }
+            }
+        }
+    }
 }
 
 # Build list of available documents

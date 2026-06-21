@@ -1,5 +1,5 @@
 ---
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
+description: Non-destructive cross-artifact consistency, coverage, and traceability analysis across spec.md, plan.md, and tasks.md. Pairs with /devspark.critic as the dual pre-implement gate (analyze = are the artifacts internally aligned? critic = will the system survive production?).
 handoffs:
   - label: Implement Project
     agent: devspark.implement
@@ -19,7 +19,21 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Overview
 
-Identify inconsistencies, duplications, ambiguities, and underspecified items across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/devspark.tasks` has successfully produced a complete `tasks.md`.
+Identify inconsistencies, duplications, ambiguities, underspecified items, and traceability gaps across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/devspark.tasks` has successfully produced a complete `tasks.md`.
+
+`/devspark.analyze` and `/devspark.critic` are the **dual pre-implement gates** with deliberately separated scope:
+
+| Concern                                         | Owner                      |
+| ----------------------------------------------- | -------------------------- |
+| Internal consistency across the three artifacts | `/devspark.analyze` (here) |
+| Coverage of stated requirements by stated tasks | `/devspark.analyze` (here) |
+| Ambiguity of **wording** (vague, untestable)    | `/devspark.analyze` (here) |
+| Rationale / Core-Problem drift spec→plan        | `/devspark.analyze` (here) |
+| Whether stated NFR **targets** are achievable   | `/devspark.critic`         |
+| What operational tasks are **missing entirely** | `/devspark.critic`         |
+| Failure modes, archetype-specific traps, scale  | `/devspark.critic`         |
+
+When a finding could land in either lane, prefer the gate that owns it above and add a brief cross-reference rather than duplicating the check.
 
 ## Operating Constraints
 
@@ -95,10 +109,11 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Identify near-duplicate requirements
 - Mark lower-quality phrasing for consolidation
 
-#### B. Ambiguity Detection
+#### B. Ambiguity Detection (wording precision only)
 
 - Flag vague adjectives (fast, scalable, secure, intuitive, robust) lacking measurable criteria
 - Flag unresolved placeholders (TODO, TKTK, ???, `<placeholder>`, etc.)
+- **Scope**: this pass evaluates whether the requirement is *worded precisely enough to act on*. Whether the stated target is *achievable in production* is `/devspark.critic`'s responsibility — do not duplicate.
 
 #### C. Underspecification
 
@@ -111,11 +126,12 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Any requirement or plan element conflicting with a MUST principle
 - Missing mandated sections or quality gates from constitution
 
-#### E. Coverage Gaps
+#### E. Coverage Gaps (requirement↔task mapping only)
 
 - Requirements with zero associated tasks
 - Tasks with no mapped requirement/story
 - Non-functional requirements not reflected in tasks (e.g., performance, security)
+- **Scope**: this pass only checks whether *stated* requirements have *stated* tasks. Whether the spec is *missing* operational tasks (observability, rollback, backups, runbooks) that no requirement called for is `/devspark.critic`'s responsibility.
 
 #### F. Inconsistency
 
@@ -123,6 +139,13 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Data entities referenced in plan but absent in spec (or vice versa)
 - Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note)
 - Conflicting requirements (e.g., one requires Next.js while other specifies Vue)
+
+#### G. Rationale & Traceability
+
+- Missing or incomplete **Rationale Summary** in any artifact (HIGH)
+- **Core-Problem drift** between spec and plan — the plan solves a meaningfully different problem than the spec describes (CRITICAL)
+- Major architectural / stack decisions in plan with no recorded tradeoff or alternatives considered (HIGH)
+- Decisions in plan that contradict an explicitly stated tradeoff in spec (CRITICAL)
 
 ### 5. Severity Assignment
 
@@ -147,16 +170,16 @@ summary: "<concise outcome>"
 
 ## Specification Analysis Report
 
-| ID | Category | Severity | Location(s) | Summary | Recommendation |
-|----|----------|----------|-------------|---------|----------------|
-| A1 | Duplication | HIGH | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
+| ID  | Category    | Severity | Location(s)      | Summary                      | Recommendation                       |
+| --- | ----------- | -------- | ---------------- | ---------------------------- | ------------------------------------ |
+| A1  | Duplication | HIGH     | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
 
 (Add one row per finding; generate stable IDs prefixed by category initial.)
 
 **Coverage Summary Table:**
 
 | Requirement Key | Has Task? | Task IDs | Notes |
-|-----------------|-----------|----------|-------|
+| --------------- | --------- | -------- | ----- |
 
 **Constitution Alignment Issues:** (if any)
 
@@ -219,13 +242,13 @@ When emitting findings (review observations, issues, recommendations), structure
 
 ```yaml
 findings:
-  - finding_id: <stable-id-unique-within-this-command-output>   # e.g., analyze-001, clarify-002
+  - finding_id: <stable-id-unique-within-this-command-output> # e.g., analyze-001, clarify-002
     severity: critical | high | medium | low
     description: <1-3 sentence problem statement>
     recommended_action: <machine-actionable next step>
     execution_mode: auto | selective | manual
-    status: open                                                  # set to `resolved` after remediation
-    outcome: ""                                                  # populated post-resolution by address-pr-review
+    status: open # set to `resolved` after remediation
+    outcome: "" # populated post-resolution by address-pr-review
 ```
 
-inding_id MUST be stable across re-runs when the underlying issue is unchanged. xecution_mode MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation). The `status` and `outcome` fields are written by `/devspark.address-pr-review` (FR-028).
+`finding_id` MUST be stable across re-runs when the underlying issue is unchanged. `execution_mode` MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation). The `status` and `outcome` fields are written by `/devspark.address-pr-review` (FR-028).

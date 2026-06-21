@@ -1,6 +1,6 @@
 ---
 description: Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
-handoffs: 
+handoffs:
   - label: Build Technical Plan
     agent: devspark.plan
     prompt: Create a plan for the spec. I am building with...
@@ -13,6 +13,18 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+## Workflow Position
+
+**Step 2 of 4** in the authoring chain (`specify → clarify → plan → tasks`).
+
+- **Owns**: targeted ambiguity reduction in an existing spec via up to 5 interactive questions, each integrated into the appropriate spec section.
+- **Does NOT own**: drafting/replacing the spec (→ `/devspark.specify`); deciding stack/architecture/data-store choices (→ `/devspark.plan` — only ask here if the *absence* of the choice blocks functional clarity); generating tasks (→ `/devspark.tasks`); adversarial review (→ `/devspark.critic`, `/devspark.analyze`).
+- **Seed queue**: any `[NEEDS CLARIFICATION: …]` markers left by `/devspark.specify` are the first candidates; resolving them removes the marker in addition to the standard integration.
+
+## Constitution Authority
+
+If `/.documentation/memory/constitution.md` exists, load it. The constitution is a **non-negotiable ambiguity-detection lens**: any mandated principle (privacy, accessibility, observability, testing, etc.) that the spec omits or leaves vague is a high-priority candidate question. Constitution conflicts cannot be resolved by answer choice — they must trigger a follow-up note in the spec recommending either spec amendment or an explicit constitution update.
 
 ## Outline
 
@@ -36,7 +48,6 @@ Execution steps:
    - Load the shared validation contract from `/.devspark/templates/spec-validation-contract.md` in installed repos, or `templates/spec-validation-contract.md` in source repos.
 
 2. Load the current spec file and validate it against the shared specification validation contract before ambiguity scanning.
-
    - If the spec has minor structural drift that can be repaired safely from existing content or authoritative frontmatter, repair it first.
    - If required route metadata or required top-level sections are missing and cannot be inferred safely, stop and instruct the user to rerun `/devspark.specify` or repair the spec manually before continuing.
    - Then perform the structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
@@ -96,69 +107,70 @@ Execution steps:
    - Information is better deferred to planning phase (note internally)
 
 3. Generate (internally) a prioritized queue of candidate clarification questions (maximum 5). Do NOT output them all at once. Apply these constraints:
-    - Maximum of 10 total questions across the whole session.
-    - Each question must be answerable with EITHER:
-       - A short multiple‑choice selection (2–5 distinct, mutually exclusive options), OR
-       - A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words").
-    - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation.
-    - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved.
-    - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness).
-    - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
-    - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic.
+   - Maximum of 10 total questions across the whole session.
+   - Each question must be answerable with EITHER:
+     - A short multiple‑choice selection (2–5 distinct, mutually exclusive options), OR
+     - A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words").
+   - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation.
+   - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved.
+   - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness).
+   - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
+   - If more than 5 categories remain unresolved, select the top 5 by (Impact \* Uncertainty) heuristic.
 
 4. Sequential questioning loop (interactive):
-    - Present EXACTLY ONE question at a time.
-    - For multiple‑choice questions:
-       - **Analyze all options** and determine the **most suitable option** based on:
-          - Best practices for the project type
-          - Common patterns in similar implementations
-          - Risk reduction (security, performance, maintainability)
-          - Alignment with any explicit project goals or constraints visible in the spec
-       - Present your **recommended option prominently** at the top with clear reasoning (1-2 sentences explaining why this is the best choice).
-       - Format as: `**Recommended:** Option [X] - <reasoning>`
-       - Then render all options as a Markdown table:
+   - Present EXACTLY ONE question at a time.
+   - For multiple‑choice questions:
+     - **Analyze all options** and determine the **most suitable option** based on:
+       - Best practices for the project type
+       - Common patterns in similar implementations
+       - Risk reduction (security, performance, maintainability)
+       - Alignment with any explicit project goals or constraints visible in the spec
+     - Present your **recommended option prominently** at the top with clear reasoning (1-2 sentences explaining why this is the best choice).
+     - Format as: `**Recommended:** Option [X] - <reasoning>`
+     - Then render all options as a Markdown table:
 
-       | Option | Description |
-       |--------|-------------|
-       | A | <Option A description> |
-       | B | <Option B description> |
-       | C | <Option C description> (add D/E as needed up to 5) |
-       | Short | Provide a different short answer (<=5 words) (Include only if free-form alternative is appropriate) |
+     | Option | Description                                                                                         |
+     | ------ | --------------------------------------------------------------------------------------------------- |
+     | A      | <Option A description>                                                                              |
+     | B      | <Option B description>                                                                              |
+     | C      | <Option C description> (add D/E as needed up to 5)                                                  |
+     | Short  | Provide a different short answer (<=5 words) (Include only if free-form alternative is appropriate) |
 
-       - After the table, add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
-    - For short‑answer style (no meaningful discrete options):
-       - Provide your **suggested answer** based on best practices and context.
-       - Format as: `**Suggested:** <your proposed answer> - <brief reasoning>`
-       - Then output: `Format: Short answer (<=5 words). You can accept the suggestion by saying "yes" or "suggested", or provide your own answer.`
-    - After the user answers:
-       - If the user replies with "yes", "recommended", or "suggested", use your previously stated recommendation/suggestion as the answer.
-       - Otherwise, validate the answer maps to one option or fits the <=5 word constraint.
-       - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
-       - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
-    - Stop asking further questions when:
-       - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
-       - User signals completion ("done", "good", "no more"), OR
-       - You reach 5 asked questions.
-    - Never reveal future queued questions in advance.
-    - If no valid questions exist at start, immediately report no critical ambiguities.
+     - After the table, add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
+
+   - For short‑answer style (no meaningful discrete options):
+     - Provide your **suggested answer** based on best practices and context.
+     - Format as: `**Suggested:** <your proposed answer> - <brief reasoning>`
+     - Then output: `Format: Short answer (<=5 words). You can accept the suggestion by saying "yes" or "suggested", or provide your own answer.`
+   - After the user answers:
+     - If the user replies with "yes", "recommended", or "suggested", use your previously stated recommendation/suggestion as the answer.
+     - Otherwise, validate the answer maps to one option or fits the <=5 word constraint.
+     - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
+     - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
+   - Stop asking further questions when:
+     - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
+     - User signals completion ("done", "good", "no more"), OR
+     - You reach 5 asked questions.
+   - Never reveal future queued questions in advance.
+   - If no valid questions exist at start, immediately report no critical ambiguities.
 
 5. Integration after EACH accepted answer (incremental update approach):
-    - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
-    - For the first integrated answer in this session:
-       - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
-       - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
-    - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
-    - Then immediately apply the clarification to the most appropriate section(s):
-       - Functional ambiguity → Update or add a bullet in Functional Requirements.
-       - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
-       - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
-       - Non-functional constraint → Add/modify measurable criteria in Non-Functional / Quality Attributes section (convert vague adjective to metric or explicit target).
-       - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
-       - Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
-    - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
-    - Save the spec file AFTER each integration to minimize risk of context loss (atomic overwrite).
-    - Preserve formatting: do not reorder unrelated sections; keep heading hierarchy intact.
-    - Keep each inserted clarification minimal and testable (avoid narrative drift).
+   - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
+   - For the first integrated answer in this session:
+     - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
+     - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
+   - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
+   - Then immediately apply the clarification to the most appropriate section(s):
+     - Functional ambiguity → Update or add a bullet in Functional Requirements.
+     - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
+     - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
+     - Non-functional constraint → Add/modify measurable criteria in Non-Functional / Quality Attributes section (convert vague adjective to metric or explicit target).
+     - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
+     - Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
+   - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
+   - Save the spec file AFTER each integration to minimize risk of context loss (atomic overwrite).
+   - Preserve formatting: do not reorder unrelated sections; keep heading hierarchy intact.
+   - Keep each inserted clarification minimal and testable (avoid narrative drift).
 
 6. Validation (performed after EACH write plus final pass):
    - Spec still satisfies the shared specification validation contract after each update.
@@ -197,13 +209,13 @@ When emitting findings (review observations, issues, recommendations), structure
 
 ```yaml
 findings:
-  - finding_id: <stable-id-unique-within-this-command-output>   # e.g., analyze-001, clarify-002
+  - finding_id: <stable-id-unique-within-this-command-output> # e.g., analyze-001, clarify-002
     severity: critical | high | medium | low
     description: <1-3 sentence problem statement>
     recommended_action: <machine-actionable next step>
     execution_mode: auto | selective | manual
-    status: open                                                  # set to `resolved` after remediation
-    outcome: ""                                                  # populated post-resolution by address-pr-review
+    status: open # set to `resolved` after remediation
+    outcome: "" # populated post-resolution by address-pr-review
 ```
 
-inding_id MUST be stable across re-runs when the underlying issue is unchanged. xecution_mode MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation). The `status` and `outcome` fields are written by `/devspark.address-pr-review` (FR-028).
+`finding_id` MUST be stable across re-runs when the underlying issue is unchanged. `execution_mode` MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation). The `status` and `outcome` fields are written by `/devspark.address-pr-review` (FR-028).

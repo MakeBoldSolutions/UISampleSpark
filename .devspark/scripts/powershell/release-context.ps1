@@ -124,6 +124,8 @@ function Get-HistoryRecovery {
         ArchiveMovesDetected = $false
         ReleaseFrom = $FromDate
         ReleaseTo = $ToDate
+        BaseSha = ''
+        HeadSha = ''
         Commits = @()
         Contributors = @()
         MergedPrNumbers = @()
@@ -156,6 +158,8 @@ function Get-HistoryRecovery {
             ArchiveMovesDetected = [bool]$history.ARCHIVE_MOVES_DETECTED
             ReleaseFrom = $history.RELEASE_FROM
             ReleaseTo = $history.RELEASE_TO
+            BaseSha = [string]$history.BASE_SHA
+            HeadSha = [string]$history.HEAD_SHA
             Commits = @($history.COMMITS)
             Contributors = @($history.CONTRIBUTORS)
             MergedPrNumbers = @($history.MERGED_PR_NUMBERS)
@@ -262,6 +266,7 @@ $releaseTo = $releaseDate
 # Find completed and pending specs
 $completedSpecs = @()
 $pendingSpecs = @()
+$statusInconsistentSpecs = @()
 
 if (Test-Path $specsDir) {
     Get-ChildItem -Path $specsDir -Directory | ForEach-Object {
@@ -270,14 +275,30 @@ if (Test-Path $specsDir) {
         if ($specName -eq "pr-review") { return }
 
         $tasksFile = Join-Path $_.FullName "tasks.md"
-        $specFile = Join-Path $_.FullName "spec.md"
+        $specFile  = Join-Path $_.FullName "spec.md"
+
+        # Read spec.md Status field
+        $specStatusField = ''
+        if (Test-Path $specFile) {
+            $specMdContent = Get-Content $specFile -Raw -ErrorAction SilentlyContinue
+            if ($specMdContent -match '\*\*Status\*\*\s*:\s*([^\r\n]+)') {
+                $specStatusField = $matches[1].Trim()
+            }
+        }
+        $specStatusIsComplete = $specStatusField -match '^Complete'
 
         if (Test-Path $tasksFile) {
-            $content = Get-Content $tasksFile -Raw -ErrorAction SilentlyContinue
+            $content   = Get-Content $tasksFile -Raw -ErrorAction SilentlyContinue
             $unchecked = ([regex]::Matches($content, '^\s*- \[ \]', 'Multiline')).Count
-            $checked = ([regex]::Matches($content, '^\s*- \[[xX]\]', 'Multiline')).Count
+            $checked   = ([regex]::Matches($content, '^\s*- \[[xX]\]', 'Multiline')).Count
+            $allDone   = ($unchecked -eq 0 -and $checked -gt 0)
 
-            if ($unchecked -eq 0 -and $checked -gt 0) {
+            if ($allDone -and $specStatusIsComplete) {
+                $completedSpecs += $specName
+            }
+            elseif ($allDone -and -not $specStatusIsComplete) {
+                # Tasks done but status field not reconciled — flag so release.md Step 3A can fix it
+                $statusInconsistentSpecs += $specName
                 $completedSpecs += $specName
             }
             elseif (Test-Path $specFile) {
@@ -316,6 +337,8 @@ $mergedPrNumbers = @($historyRecovery.MergedPrNumbers | Sort-Object -Unique)
 $mergedPrCount = [int]$historyRecovery.MergedPrCount
 $prReviews = @($historyRecovery.PrReviews)
 $prReviewSummary = $historyRecovery.PrReviewSummary
+$baseSha = [string]$historyRecovery.BaseSha
+$headSha = [string]$historyRecovery.HeadSha
 
 # Calculate next version if not provided
 $nextVersion = $versionArg
@@ -381,15 +404,18 @@ if ($Json) {
         VERSION_BUMP           = $versionBump
         RELEASE_FROM           = $releaseFrom
         RELEASE_TO             = $releaseTo
-        ACTIVE_COMPLETED_SPECS = $activeCompletedSpecs
-        COMPLETED_SPECS        = $completedSpecs
-        RECOVERED_COMPLETED_SPECS = $recoveredCompletedSpecs
-        PENDING_SPECS          = $pendingSpecs
+        ACTIVE_COMPLETED_SPECS        = $activeCompletedSpecs
+        COMPLETED_SPECS               = $completedSpecs
+        RECOVERED_COMPLETED_SPECS     = $recoveredCompletedSpecs
+        STATUS_INCONSISTENT_SPECS     = $statusInconsistentSpecs
+        PENDING_SPECS                 = $pendingSpecs
         ACTIVE_QUICKFIXES      = $activeQuickfixes
         QUICKFIXES             = $quickfixes
         RECOVERED_QUICKFIXES   = $recoveredQuickfixes
         LAST_TAG               = $lastTag
         LAST_RELEASE_DATE      = $lastReleaseDate
+        BASE_SHA               = $baseSha
+        HEAD_SHA               = $headSha
         COMMITS_SINCE_RELEASE  = $commitsSince
         CONTRIBUTORS           = $contributors
         MERGED_PR_NUMBERS      = $mergedPrNumbers
@@ -422,6 +448,12 @@ else {
     Write-Output "Quickfixes: $($quickfixes.Count)"
     Write-Output "Contributors: $($contributors.Count)"
     Write-Output "Merged PRs: $mergedPrCount"
+    if ($statusInconsistentSpecs.Count -gt 0) {
+        Write-Output ''
+        Write-Output "WARNING: $($statusInconsistentSpecs.Count) spec(s) have all tasks complete but **Status** field is not 'Complete'."
+        Write-Output "These will be included in COMPLETED_SPECS but must have their status field updated before archiving."
+        foreach ($s in $statusInconsistentSpecs) { Write-Output "  - $s" }
+    }
     if ($recoveredCompletedSpecs.Count -gt 0 -or $recoveredQuickfixes.Count -gt 0) {
         Write-Output ''
         Write-Output "Recovered Specs: $($recoveredCompletedSpecs.Count)"

@@ -34,7 +34,8 @@ param(
     [ValidateSet('full', 'specs', 'docs', 'comments', 'changelog', 'scan')]
     [string]$Scope = 'full',
     [switch]$Json,
-    [int]$SampleLimit = 100
+    [int]$SampleLimit = 100,
+    [string]$OutFile = ''
 )
 
 # Import common functions
@@ -237,13 +238,14 @@ $result = @{
         legacy_roots = @()
     }
     summary           = @{
-        specs_completed      = 0
-        specs_in_progress    = 0
-        specs_draft          = 0
-        docs_to_archive      = 0
-        code_comments_found  = 0
-        changelog_gaps       = 0
-        bak_files_found      = 0
+        specs_completed           = 0
+        specs_in_progress         = 0
+        specs_draft               = 0
+        specs_status_inconsistent = 0
+        docs_to_archive           = 0
+        code_comments_found       = 0
+        changelog_gaps            = 0
+        bak_files_found           = 0
     }
 }
 
@@ -299,9 +301,17 @@ if ($Scope -in @('full', 'specs', 'scan')) {
                 $incompleteTasks = $totalTasks - $completedTasks
             }
 
-            # --- spec.md / plan.md presence ---
+            # --- spec.md / plan.md presence and Status field ---
             $hasSpec = Test-Path (Join-Path $specPath 'spec.md')
             $hasPlan = Test-Path (Join-Path $specPath 'plan.md')
+            $specStatusField = ''
+            if ($hasSpec) {
+                $specMdContent = Get-Content (Join-Path $specPath 'spec.md') -Raw -ErrorAction SilentlyContinue
+                if ($specMdContent -match '\*\*Status\*\*\s*:\s*([^\r\n]+)') {
+                    $specStatusField = $matches[1].Trim()
+                }
+            }
+            $specStatusIsComplete = $specStatusField -match '^Complete'
 
             # --- CHANGELOG cross-reference ---
             $inChangelog = $false
@@ -332,11 +342,22 @@ if ($Scope -in @('full', 'specs', 'scan')) {
             }
 
             # --- Determine status ---
+            # A spec is fully 'completed' only when:
+            #   - **Status**: Complete in spec.md
+            #   - all tasks are checked in tasks.md
+            #   - a CHANGELOG entry exists (i.e., /devspark.release has been run)
+            # If tasks are done and status is Complete but no CHANGELOG entry exists,
+            # classify as 'completed-needs-changelog' — run /devspark.release first.
+            # If tasks are done but status field is not Complete, classify as
+            # 'status-inconsistent' so the user reconciles before archiving.
             $status = 'draft'
-            if ($hasTasks -and $totalTasks -gt 0 -and $incompleteTasks -eq 0 -and $inChangelog) {
+            $allTasksDone = ($hasTasks -and $totalTasks -gt 0 -and $incompleteTasks -eq 0)
+            if ($allTasksDone -and $specStatusIsComplete -and $inChangelog) {
                 $status = 'completed'
-            } elseif ($hasTasks -and $totalTasks -gt 0 -and $incompleteTasks -eq 0) {
+            } elseif ($allTasksDone -and $specStatusIsComplete) {
                 $status = 'completed-needs-changelog'
+            } elseif ($allTasksDone -and -not $specStatusIsComplete) {
+                $status = 'status-inconsistent'
             } elseif ($hasTasks -and $completedTasks -gt 0) {
                 $status = 'in-progress'
             } elseif ($hasPlan -or $hasSpec) {
@@ -348,19 +369,20 @@ if ($Scope -in @('full', 'specs', 'scan')) {
                 ForEach-Object { $_.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') }
 
             $specEntry = @{
-                name             = $specName
-                number           = $specNumber
-                status           = $status
-                path             = $specPath.Substring($repoRoot.Length + 1).Replace('\', '/')
-                has_spec         = $hasSpec
-                has_plan         = $hasPlan
-                has_tasks        = $hasTasks
-                total_tasks      = $totalTasks
-                completed_tasks  = $completedTasks
-                incomplete_tasks = $incompleteTasks
-                in_changelog     = $inChangelog
-                pr_review        = $prReviewFound
-                files            = $specFiles
+                name              = $specName
+                number            = $specNumber
+                status            = $status
+                spec_status_field = $specStatusField
+                path              = $specPath.Substring($repoRoot.Length + 1).Replace('\', '/')
+                has_spec          = $hasSpec
+                has_plan          = $hasPlan
+                has_tasks         = $hasTasks
+                total_tasks       = $totalTasks
+                completed_tasks   = $completedTasks
+                incomplete_tasks  = $incompleteTasks
+                in_changelog      = $inChangelog
+                pr_review         = $prReviewFound
+                files             = $specFiles
             }
 
             $result.specs += $specEntry
@@ -380,7 +402,15 @@ if ($Scope -in @('full', 'specs', 'scan')) {
                     $result.changelog_gaps += @{
                         spec_name   = $specName
                         spec_number = $specNumber
-                        reason      = 'All tasks complete but no CHANGELOG entry found'
+                        reason      = 'All tasks complete and **Status**: Complete, but no CHANGELOG entry found — run /devspark.release first'
+                    }
+                }
+                'status-inconsistent' {
+                    $result.summary.specs_status_inconsistent++
+                    $result.changelog_gaps += @{
+                        spec_name   = $specName
+                        spec_number = $specNumber
+                        reason      = "All tasks complete but **Status** field is '$specStatusField' (not Complete) — update spec.md status before harvesting"
                     }
                 }
                 'in-progress' { $result.summary.specs_in_progress++ }
@@ -388,8 +418,20 @@ if ($Scope -in @('full', 'specs', 'scan')) {
             }
 
             if (-not $Json) {
-                $icon  = switch ($status) { 'completed' { '✅' } 'completed-needs-changelog' { '⚠️' } 'in-progress' { '🔄' } 'draft' { '📋' } }
-                $color = switch ($status) { 'completed' { 'Green' } 'completed-needs-changelog' { 'Yellow' } 'in-progress' { 'Cyan' } 'draft' { 'Gray' } }
+                $icon  = switch ($status) {
+                    'completed'                 { '[OK]' }
+                    'completed-needs-changelog' { '[!]' }
+                    'status-inconsistent'       { '[?]' }
+                    'in-progress'               { '[~]' }
+                    'draft'                     { '[-]' }
+                }
+                $color = switch ($status) {
+                    'completed'                 { 'Green' }
+                    'completed-needs-changelog' { 'Yellow' }
+                    'status-inconsistent'       { 'Red' }
+                    'in-progress'               { 'Cyan' }
+                    'draft'                     { 'Gray' }
+                }
                 Write-Host "  $icon $specName ($status)" -ForegroundColor $color
             }
         }
@@ -601,14 +643,37 @@ if (-not $Json) {
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
     Write-Host "  HARVEST PRE-SCAN SUMMARY" -ForegroundColor Cyan
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
-    Write-Host "  Specs completed:      $($result.summary.specs_completed)" -ForegroundColor $(if ($result.summary.specs_completed -gt 0) { 'Green' } else { 'Gray' })
-    Write-Host "  Specs in-progress:    $($result.summary.specs_in_progress)" -ForegroundColor $(if ($result.summary.specs_in_progress -gt 0) { 'Cyan' } else { 'Gray' })
-    Write-Host "  Specs draft:          $($result.summary.specs_draft)" -ForegroundColor Gray
-    Write-Host "  CHANGELOG gaps:       $($result.summary.changelog_gaps)" -ForegroundColor $(if ($result.summary.changelog_gaps -gt 0) { 'Yellow' } else { 'Green' })
-    Write-Host "  Docs to archive:      $($result.summary.docs_to_archive)" -ForegroundColor $(if ($result.summary.docs_to_archive -gt 0) { 'Yellow' } else { 'Green' })
-    Write-Host "  Code comment refs:    $($result.summary.code_comments_found)" -ForegroundColor $(if ($result.summary.code_comments_found -gt 0) { 'Yellow' } else { 'Green' })
-    Write-Host "  Backup files:         $($result.summary.bak_files_found)" -ForegroundColor $(if ($result.summary.bak_files_found -gt 0) { 'Yellow' } else { 'Green' })
+    Write-Host "  Specs completed:           $($result.summary.specs_completed)" -ForegroundColor $(if ($result.summary.specs_completed -gt 0) { 'Green' } else { 'Gray' })
+    Write-Host "  Specs in-progress:         $($result.summary.specs_in_progress)" -ForegroundColor $(if ($result.summary.specs_in_progress -gt 0) { 'Cyan' } else { 'Gray' })
+    Write-Host "  Specs draft:               $($result.summary.specs_draft)" -ForegroundColor Gray
+    Write-Host "  Status inconsistencies:    $($result.summary.specs_status_inconsistent)" -ForegroundColor $(if ($result.summary.specs_status_inconsistent -gt 0) { 'Red' } else { 'Green' })
+    Write-Host "  CHANGELOG gaps:            $($result.summary.changelog_gaps)" -ForegroundColor $(if ($result.summary.changelog_gaps -gt 0) { 'Yellow' } else { 'Green' })
+    Write-Host "  Docs to archive:           $($result.summary.docs_to_archive)" -ForegroundColor $(if ($result.summary.docs_to_archive -gt 0) { 'Yellow' } else { 'Green' })
+    Write-Host "  Code comment refs:         $($result.summary.code_comments_found)" -ForegroundColor $(if ($result.summary.code_comments_found -gt 0) { 'Yellow' } else { 'Green' })
+    Write-Host "  Backup files:              $($result.summary.bak_files_found)" -ForegroundColor $(if ($result.summary.bak_files_found -gt 0) { 'Yellow' } else { 'Green' })
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
 }
 
-$result | ConvertTo-Json -Depth 10
+$jsonOutput = $result | ConvertTo-Json -Depth 10
+
+if ($OutFile) {
+    $outPath = if ([IO.Path]::IsPathRooted($OutFile)) {
+        $OutFile
+    } else {
+        Join-Path $repoRoot $OutFile
+    }
+
+    $outDir = Split-Path -Parent $outPath
+    if ($outDir -and -not (Test-Path $outDir)) {
+        New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+    }
+
+    # Persist a copy for resilient tooling when stdout capture is truncated.
+    Set-Content -Path $outPath -Value $jsonOutput -Encoding UTF8
+
+    if (-not $Json) {
+        Write-Host "[OUTPUT] Harvest context saved to $($outPath.Substring($repoRoot.Length + 1).Replace('\\', '/'))" -ForegroundColor Gray
+    }
+}
+
+$jsonOutput
