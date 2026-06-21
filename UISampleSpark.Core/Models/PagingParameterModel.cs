@@ -6,7 +6,7 @@ namespace UISampleSpark.Core.Models;
 public class PagingParameterModel
 {
     private const int maxPageSize = 5000;
-    private int _pageSize { get; set; }
+    private int? _pageSize { get; set; }
     public PagingParameterModel()
     {
         _pageSize = 300;
@@ -14,19 +14,21 @@ public class PagingParameterModel
     }
     public object GetMetaData(long TotalCount)
     {
+        var pageSize = PageSize ?? 300;
+        var pageNumber = PageNumber ?? 1;
         return new
         {
             totalCount = TotalCount,
-            pageSize = PageSize,
-            currentPage = PageNumber,
-            totalPages = (int)Math.Ceiling(TotalCount / (double)PageSize),
-            previousPage = PageNumber > 1 ? "Yes" : "No",
-            nextPage = PageNumber < (int)Math.Ceiling(TotalCount / (double)PageSize) ? "Yes" : "No"
+            pageSize = pageSize,
+            currentPage = pageNumber,
+            totalPages = (int)Math.Ceiling(TotalCount / (double)pageSize),
+            previousPage = pageNumber > 1 ? "Yes" : "No",
+            nextPage = pageNumber < (int)Math.Ceiling(TotalCount / (double)pageSize) ? "Yes" : "No"
         };
     }
 
-    public int PageNumber { get; set; }
-    public int PageSize
+    public int? PageNumber { get; set; }
+    public int? PageSize
     {
         get { return _pageSize; }
         set { _pageSize = value > maxPageSize ? maxPageSize : value; }

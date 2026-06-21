@@ -184,14 +184,16 @@ public partial class EmployeeDatabaseService : IEmployeeService
     public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(PagingParameterModel paging, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(paging);
+        var pageNumber = paging.PageNumber ?? 1;
+        var pageSize = paging.PageSize ?? 300;
         IQueryable<Models.Data.Employee> source = _context.Employees
             .Include(i => i.Department)
             .OrderBy(o => o.Name)
             .AsNoTracking();
-        
+
         List<Models.Data.Employee> items = await source
-            .Skip((paging.PageNumber - 1) * paging.PageSize)
-            .Take(paging.PageSize)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(token)
             .ConfigureAwait(false);
 
