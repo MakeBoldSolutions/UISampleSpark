@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Filters;
+using UISampleSpark.Core.Security;
 
 namespace UISampleSpark.UI.Middleware;
 
@@ -55,7 +56,7 @@ public sealed class ApiKeyAuthorizationFilter : IAsyncActionFilter
         }
 
         string? providedApiKey = GetProvidedApiKey(context.HttpContext.Request);
-        if (!IsApiKeyValid(providedApiKey, configuredApiKeys))
+        if (!ApiKeyValidator.IsApiKeyValid(providedApiKey, configuredApiKeys))
         {
             context.Result = new UnauthorizedObjectResult(new { error = "Missing or invalid API key." });
             return;
@@ -82,18 +83,5 @@ public sealed class ApiKeyAuthorizationFilter : IAsyncActionFilter
         }
 
         return null;
-    }
-
-    private static bool IsApiKeyValid(string? providedApiKey, IEnumerable<string> configuredApiKeys)
-    {
-        if (string.IsNullOrWhiteSpace(providedApiKey))
-        {
-            return false;
-        }
-
-        byte[] provided = Encoding.UTF8.GetBytes(providedApiKey);
-        return configuredApiKeys
-            .Select(Encoding.UTF8.GetBytes)
-            .Any(expected => CryptographicOperations.FixedTimeEquals(provided, expected));
     }
 }

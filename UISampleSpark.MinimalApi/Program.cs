@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.RateLimiting;
 using UISampleSpark.Core.Interfaces;
 using UISampleSpark.Core.Models;
-using UISampleSpark.MinimalApi.Helpers;
+using UISampleSpark.Core.Helpers;
 using UISampleSpark.MinimalApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);

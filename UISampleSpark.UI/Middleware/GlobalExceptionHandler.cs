@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using UISampleSpark.Core.Exceptions;
 
 namespace UISampleSpark.UI.Middleware;
 
@@ -74,14 +75,14 @@ public class GlobalExceptionHandler : IExceptionHandler
             httpContext.User?.Identity?.Name ?? "Anonymous");
 
         // Determine appropriate HTTP status code based on exception type
-        var statusCode = DetermineStatusCode(exception);
+        var statusCode = ExceptionHttpMapper.DetermineStatusCode(exception);
 
         // Build RFC 7807 compliant ProblemDetails response
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = GetTitleForStatusCode(statusCode),
-            Detail = GetDetailMessage(exception),
+            Title = ExceptionHttpMapper.GetTitleForStatusCode(statusCode),
+            Detail = ExceptionHttpMapper.GetDetailMessage(exception, _environment.IsDevelopment()),
             Instance = httpContext.Request.Path,
             Type = $"https://httpstatuses.com/{statusCode}",
             Extensions =
@@ -117,64 +118,4 @@ public class GlobalExceptionHandler : IExceptionHandler
         return true; // Exception has been handled
     }
 
-    /// <summary>
-    /// Determines the appropriate HTTP status code based on the exception type.
-    /// </summary>
-    /// <param name="exception">The exception to evaluate.</param>
-    /// <returns>An HTTP status code that best represents the error condition.</returns>
-    private static int DetermineStatusCode(Exception exception) => exception switch
-    {
-        ArgumentNullException => StatusCodes.Status400BadRequest,
-        ArgumentException => StatusCodes.Status400BadRequest,
-        InvalidOperationException => StatusCodes.Status400BadRequest,
-        UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-        KeyNotFoundException => StatusCodes.Status404NotFound,
-        NotImplementedException => StatusCodes.Status501NotImplemented,
-        TimeoutException => StatusCodes.Status408RequestTimeout,
-        _ => StatusCodes.Status500InternalServerError
-    };
-
-    /// <summary>
-    /// Gets a human-readable title for the given HTTP status code.
-    /// </summary>
-    /// <param name="statusCode">The HTTP status code.</param>
-    /// <returns>A descriptive title for the status code.</returns>
-    private static string GetTitleForStatusCode(int statusCode) => statusCode switch
-    {
-        400 => "Bad Request",
-        401 => "Unauthorized",
-        403 => "Forbidden",
-        404 => "Not Found",
-        408 => "Request Timeout",
-        500 => "Internal Server Error",
-        501 => "Not Implemented",
-        503 => "Service Unavailable",
-        _ => "Error"
-    };
-
-    /// <summary>
-    /// Gets the error detail message, adjusted based on environment.
-    /// </summary>
-    /// <param name="exception">The exception to get details from.</param>
-    /// <returns>A detail message appropriate for the current environment.</returns>
-    private string GetDetailMessage(Exception exception)
-    {
-        if (_environment.IsDevelopment())
-        {
-            // Development: Show full exception message
-            return exception.Message;
-        }
-
-        // Production: Provide generic message to avoid information disclosure
-        return exception switch
-        {
-            ArgumentNullException => "A required parameter was not provided.",
-            ArgumentException => "The request contained invalid arguments. Please check your input and try again.",
-            UnauthorizedAccessException => "You do not have permission to access this resource.",
-            KeyNotFoundException => "The requested resource was not found.",
-            NotImplementedException => "This feature is not yet implemented.",
-            TimeoutException => "The request took too long to complete. Please try again later.",
-            _ => "An unexpected error occurred. Please contact support if the issue persists."
-        };
-    }
 }

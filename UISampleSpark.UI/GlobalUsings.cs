@@ -5,6 +5,7 @@ global using Microsoft.Extensions.DependencyInjection.Extensions;
 global using UISampleSpark.Core.Interfaces;
 global using UISampleSpark.Core.Models;
 global using UISampleSpark.UI.Extensions;
+global using UISampleSpark.Core.Helpers;
 global using UISampleSpark.UI.Helpers;
 global using UISampleSpark.UI.Models;
 global using System.Diagnostics;

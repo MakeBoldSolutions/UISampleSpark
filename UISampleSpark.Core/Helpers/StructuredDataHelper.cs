@@ -1,7 +1,7 @@
 using System.Text.Json;
 using UISampleSpark.Core.Models;
 
-namespace UISampleSpark.UI.Helpers;
+namespace UISampleSpark.Core.Helpers;
 
 /// <summary>
 /// Helper class for generating structured data (JSON-LD) markup
@@ -110,7 +110,7 @@ public static class StructuredDataHelper
             }
         };
 
-        return JsonSerializer.Serialize(person, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+        return JsonSerializer.Serialize(person, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
     }
 
     /// <summary>

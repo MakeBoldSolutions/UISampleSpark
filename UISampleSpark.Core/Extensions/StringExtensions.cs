@@ -99,4 +99,35 @@ public static class StringExtensions
     /// <returns>Trimmed string or string.empty is the value was null</returns>
     public static string TrimIfNotNull(this string? value) =>
         value?.Trim() ?? string.Empty;
+
+    /// <summary>
+    /// Splits a string by a separator and converts each element to the specified type.
+    /// Elements that cannot be converted are skipped and <paramref name="allConverted"/> is set to false.
+    /// </summary>
+    /// <typeparam name="T">The target type to convert elements to.</typeparam>
+    /// <param name="value">The input string to split.</param>
+    /// <param name="separator">The character used to separate elements.</param>
+    /// <param name="allConverted">Output parameter indicating whether all conversions succeeded.</param>
+    /// <returns>A list of successfully converted elements.</returns>
+    public static List<T> SplitAndConvert<T>(this string value, char separator, out bool allConverted)
+    {
+        var results = new List<T>();
+        allConverted = true;
+        foreach (string item in value.Split(separator))
+        {
+            try
+            {
+                results.Add((T)Convert.ChangeType(item, typeof(T), System.Globalization.CultureInfo.InvariantCulture));
+            }
+            catch (InvalidCastException)
+            {
+                allConverted = false;
+            }
+            catch (FormatException)
+            {
+                allConverted = false;
+            }
+        }
+        return results;
+    }
 }
