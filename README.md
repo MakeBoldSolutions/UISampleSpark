@@ -150,6 +150,14 @@ Implemented via Bootswatch services and `<bootswatch-theme-switcher />` integrat
 - `/status` provides application metadata
 
 ---
+
+## Repo Story
+
+An evidence-based narrative of this repository's development history, contributor patterns,
+and architecture:
+[Repo Story (2026-06-21)](.documentation/repo-story/repo-story-2026-06-21.md)
+
+---
 ## Contributing
 Contributions welcome. Submit issues or PRs.
 
