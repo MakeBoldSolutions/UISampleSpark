@@ -4,11 +4,64 @@ This document captures notable milestones extracted from the git history of `UIS
 
 ## 2026
 
+### v10.2.0 — Consolidation & Vanilla JS Expansion *(Tag: v10.2.0, Jun 21 2026)*
+
+A consolidation and feature-expansion release delivering Data-Core project merge, OpenAPI
+tooling modernisation, Minimal API migration, and a new Vanilla JS employee CRUD demo.
+
+#### Added
+
+- **Vanilla JS Employee CRUD** (`/EmployeeVanilla`): Pure vanilla JavaScript implementation
+  with native Fetch API, DOM manipulation, and Bootstrap 5 modals — no framework dependencies.
+- **Make Bold Solutions Branding**: Updated site-wide branding and identity.
+- **Sync-Upstream Script**: `sync-upstream.ps1` helper for fork contributors to rebase against upstream.
+
+#### Changed
+
+- **Data-Core Consolidation**: Merged `UISampleSpark.Data` project into `UISampleSpark.Core`,
+  reducing the solution from 5 to 4 projects (see [ADR-001](.documentation/decisions/ADR-001.md)).
+- **OpenAPI Tooling**: Replaced `Swashbuckle.AspNetCore` with `Microsoft.AspNetCore.OpenApi`
+  (built-in) and `ApiTestSpark` — eliminates CVE-flagged dependency
+  (see [ADR-002](.documentation/decisions/ADR-002.md)).
+- **Minimal API Migration**: Replaced `[ApiController]` MVC controllers in `UISampleSpark.UI`
+  with Minimal API endpoint registrations (see [ADR-003](.documentation/decisions/ADR-003.md)).
+- **Paging Parameters**: Made nullable with sensible default fallbacks.
+- **API Documentation**: Enhanced endpoint descriptions and OpenAPI metadata.
+- **Code Refactoring**: Improved readability; resolved all `latest-all` analyzer warnings.
+
+#### Fixed
+
+- **noindex Policy**: Enforced and hardened SEO noindex verification.
+- **API Filters/Endpoints**: Hardened endpoint validation and filter logic.
+- **React/Babel CDN Pins**: Pinned versions to prevent silent upstream CDN breakage.
+
+#### Architectural Decisions
+
+- **ADR-001**: Data-Core Project Consolidation
+- **ADR-002**: OpenAPI Tooling Migration — Swashbuckle to ApiTestSpark
+- **ADR-003**: Minimal API Migration in UISampleSpark.UI Host
+
+#### Dependencies
+
+- `Microsoft.EntityFrameworkCore.*` → 10.0.9
+- `coverlet.collector` → 10.0.0
+- `Westwind.AspNetCore.Markdown` → 3.41.0
+- `datatables.net-bs5` → 2.3.8
+- `actions/checkout` → v6 · `actions/github-script` → v9
+
+#### Contributors
+
+- Mark Hazleton
+- dependabot[bot]
+
+---
+
 ### v10.0.1 — .NET 10 Refresh *(Tag: v10.0.1, Mar 28 2026)*
 
 A comprehensive hardening, governance, and multi-UI expansion release building on the .NET 10 migration.
 
 #### Security & Hardening
+
 - Resolved **109 CodeQL security alerts** across the codebase
 - Added **per-IP rate limiting** (100 req/min) to both MVC/API and Minimal API hosts
 - Added **feature-flagged multi-key API protection** on Minimal API endpoints
@@ -17,18 +70,21 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - Added `IExceptionHandler` with RFC 7807 `ProblemDetails` to Minimal API host
 
 #### Architecture & Quality
+
 - Added `/health` endpoint and always-on Swagger to Minimal API (Principle VII compliance)
 - Elevated `AnalysisLevel` to `latest-all` across all projects including test projects (Principle I compliance)
 - Resolved stale TODO in EmployeeMock and improved mock implementation comments
 - Full constitution compliance audit — 82% → all 5 findings remediated
 
 #### Multi-UI Front-Ends
+
 - **React 18** Employee CRUD (`/EmployeeReact`) with hooks, Fetch API, sortable columns, pagination, modal forms, and toast notifications
 - **htmx** Employee CRUD with server-driven partial updates
 - **Vue 3** Employee CRUD with reactive data binding
 - **Blazor** interactive Employee CRUD components
 
 #### Governance & Documentation
+
 - Ratified **project constitution v1.0.0** (11 core principles, Feb 2026)
 - Rebranded from SampleMvcCRUD to **UISampleSpark** with modernized project structure
 - Added repository story narrative (703 commits, 7 years of history)
@@ -36,6 +92,7 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - Integrated Spec Kit Spark agent workflows (archive, harvest, upgrade, site-audit, repo-story)
 
 #### Dependencies & CI/CD
+
 - `Swashbuckle.AspNetCore` → 10.1.7
 - `WebSpark.HttpClientUtility` → 2.5.0
 - `coverlet.collector` → 8.0.1
@@ -46,6 +103,7 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - Made Application Insights telemetry optional
 
 #### Tests
+
 - **240 tests passing** (0 failures) across Core.Tests and Data.Tests
 - Sampled coverage: StringExtensions 100%, EmployeeDto 91%, EmployeeDatabaseService 93.5%
 
@@ -55,6 +113,7 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - **Feb 6** – Added a React 18 Employee CRUD implementation (`/EmployeeReact`) with functional components, hooks, and Fetch API. Introduced a dedicated `_LayoutReact.cshtml` layout loading React/Babel via CDN to isolate from jQuery-based pages. Features include sortable columns, search/filter, pagination, modal forms with Bootstrap 5 validation, delete confirmation dialog, and toast notifications.
 
 ## 2025
+
 - **Nov 16** *(Tag: net10-ga)* – Migrated the solution to .NET 10.0, refactored project structure, hardened Docker and GitHub Actions workflows, and replaced `System.Drawing` with SkiaSharp for cross-platform image processing.
 - **Sep 7** – Performed a dependency refresh across all projects to prepare for the upcoming .NET 10 upgrade window.
 - **Jul 28** *(Tag: docker-hardening-2025)* – Tuned Docker linting with a `.hadolint.yaml`, strengthened Dockerfile scripting, refreshed breadcrumb/navigation UX, and expanded SEO and favicon assets.
@@ -63,6 +122,7 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - **Jan 20** – Updated project documentation to reflect architecture changes heading into the 2025 roadmap.
 
 ## 2024
+
 - **Sep 20-24** *(Tag: net9-ga)* – Upgraded the application stack to .NET 9.0, refreshed Razor Pages, tuned Docker/GitHub workflows, and synchronized versioning across projects.
 - **Aug 3-27** – Iterated on CI configuration while applying scheduled NuGet maintenance for solution stability.
 - **May 2-29** – Removed Aspire hosting artifacts, reorganized project structure, merged Dependabot dependency bumps, and simplified deployment workflows.
@@ -72,6 +132,7 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - **Jan 24-Feb 13** – Added the AspireHost project and continued dependency maintenance to support future cloud scenarios.
 
 ## 2023
+
 - **Oct 22** *(Tag: net8-ga)* – Completed the .NET 8 migration, streamlined Swagger integration, and modernized Docker automation.
 - **Oct 9** – Established Azure Pipelines CI, reconciled `global.json`, addressed EF Core unit test regressions, and harmonized GitHub workflows.
 - **Sep 8-25** – Improved employee data integrity (gender fixes), refreshed dependencies, and standardized Razor Page experiences.
@@ -80,6 +141,7 @@ A comprehensive hardening, governance, and multi-UI expansion release building o
 - **Mar-Apr** – Introduced Swagger styling, merged iterative NuGet updates, and documented new HTTP request samples for API testing.
 
 ## 2022
+
 - **Nov 8** *(Tag: net7-ga)* – Upgraded the solution to .NET 7, refreshed publish profiles, and tuned Docker support for Linux-based hosting.
 - **Oct 1-26** – Added the `TreeNode` hierarchy helpers, hardened guard clauses, and continued documentation and README improvements.
 - **Sep 17-22** – Strengthened DTO validation, resolved nullability warnings, increased unit test coverage, and refined Ajax workflows.
