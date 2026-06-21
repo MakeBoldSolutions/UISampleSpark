@@ -66,7 +66,7 @@
     
     <div id="dialogBackdrop" class="modal-backdrop fade d-none" aria-hidden="true"></div>
     <div id="employeeDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"
-         class="modal fade d-none" tabindex="-1" style="display:block!important">
+         class="modal fade d-none" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -273,6 +273,7 @@ await fetch(`/api/employee/${id}`, { method: 'DELETE' });</code></pre>
 
   // ── Bootstrap-free dialog ─────────────────────────────────────
   function openDialog() {
+    dialog.style.display = 'block';
     dialog.classList.remove('d-none');
     dialog.classList.add('show');
     backdrop.classList.remove('d-none');
@@ -284,6 +285,7 @@ await fetch(`/api/employee/${id}`, { method: 'DELETE' });</code></pre>
   function closeDialog() {
     dialog.classList.remove('show');
     dialog.classList.add('d-none');
+    dialog.style.display = '';
     backdrop.classList.remove('show');
     backdrop.classList.add('d-none');
     document.body.classList.remove('modal-open');
