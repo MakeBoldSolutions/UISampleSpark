@@ -76,7 +76,7 @@ public class EmployeeDB : IEmployeeDB
 
     public async Task<bool> DeleteEmployeeAsync(int ID)
     {
-        Models.Data.Employee? delEmployee = await _context.Employees.FindAsync(ID);
+        Models.Data.Employee? delEmployee = await _context.Employees.FindAsync(ID).ConfigureAwait(false);
         if (delEmployee is null)
         {
             return false;
@@ -84,7 +84,7 @@ public class EmployeeDB : IEmployeeDB
         try
         {
             _context.Employees.Remove(delEmployee);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync().ConfigureAwait(false);
 
         }
         catch (Exception ex)
@@ -97,14 +97,14 @@ public class EmployeeDB : IEmployeeDB
 
     public async Task<DepartmentDto> DepartmentAsync(int id)
     {
-        return Create(await _context.Departments.Where(w => w.Id == id).Include(i => i.Employees).FirstOrDefaultAsync());
+        return Create(await _context.Departments.Where(w => w.Id == id).Include(i => i.Employees).FirstOrDefaultAsync().ConfigureAwait(false));
     }
 
     public async Task<List<DepartmentDto>> DepartmentCollectionAsync()
     {
         try
         {
-            List<Models.Data.Department> dbDeptList = await _context.Departments.OrderBy(o => o.Name).ToListAsync();
+            List<Models.Data.Department> dbDeptList = await _context.Departments.OrderBy(o => o.Name).ToListAsync().ConfigureAwait(false);
             return Create(dbDeptList);
         }
         catch (Exception ex)
@@ -116,13 +116,13 @@ public class EmployeeDB : IEmployeeDB
 
     public async Task<EmployeeDto?> EmployeeAsync(int id)
     {
-        Models.Data.Employee? empEntity = await _context.Employees.Where(w => w.Id == id).FirstOrDefaultAsync();
+        Models.Data.Employee? empEntity = await _context.Employees.Where(w => w.Id == id).FirstOrDefaultAsync().ConfigureAwait(false);
         return empEntity is null ? null : Create(empEntity);
     }
 
     public async Task<List<EmployeeDto>> EmployeeCollectionAsync()
     {
-        return Create(await _context.Employees.OrderBy(o => o.Name).ToListAsync());
+        return Create(await _context.Employees.OrderBy(o => o.Name).ToListAsync().ConfigureAwait(false));
     }
 
     public async Task<EmployeeDto?> UpdateAsync(EmployeeDto? emp)
@@ -147,7 +147,7 @@ public class EmployeeDB : IEmployeeDB
         }
         else
         {
-            Models.Data.Employee? saveUser = await _context.Employees.FindAsync(emp.Id);
+            Models.Data.Employee? saveUser = await _context.Employees.FindAsync(emp.Id).ConfigureAwait(false);
 
             if (saveUser != null)
             {
@@ -160,7 +160,7 @@ public class EmployeeDB : IEmployeeDB
                 saveUser.ProfilePicture = emp.ProfilePicture ?? "default.jpg";
                 saveUser.LastUpdatedDate = DateTime.Now;
                 saveUser.Gender = (Models.Data.Gender)emp.Gender;
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             else
             {
@@ -175,13 +175,13 @@ public class EmployeeDB : IEmployeeDB
                     ProfilePicture = emp.ProfilePicture ?? "default.jpg",
                     Gender = (Models.Data.Gender)emp.Gender,
                 };
-                await _context.Employees.AddAsync(saveUser);
-                await _context.SaveChangesAsync();
+                await _context.Employees.AddAsync(saveUser).ConfigureAwait(false);
+                await _context.SaveChangesAsync().ConfigureAwait(false);
                 emp.Id = saveUser.Id;
 
             }
         }
-        return await EmployeeAsync(emp.Id);
+        return await EmployeeAsync(emp.Id).ConfigureAwait(false);
     }
 
     public async Task<DepartmentDto?> UpdateAsync(DepartmentDto? dept)
@@ -200,13 +200,13 @@ public class EmployeeDB : IEmployeeDB
             Description = dept.Description
         };
 
-        Models.Data.Department? saveDept = await _context.Departments.FindAsync(updateDept.Id);
+        Models.Data.Department? saveDept = await _context.Departments.FindAsync(updateDept.Id).ConfigureAwait(false);
         if (saveDept != null)
         {
             _context.Departments.Attach(saveDept);
             saveDept.Name = string.IsNullOrEmpty(updateDept.Name) ? saveDept.Name : updateDept.Name;
             saveDept.Description = string.IsNullOrEmpty(updateDept.Description) ? saveDept.Description : updateDept.Description;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
         else
         {
@@ -216,9 +216,9 @@ public class EmployeeDB : IEmployeeDB
                 Name = string.IsNullOrEmpty(updateDept.Name) ? "MISSING NAME" : updateDept.Name,
                 Description = string.IsNullOrEmpty(updateDept.Description) ? "MISSING DESCRIPTION" : updateDept.Description,
             };
-            await _context.Departments.AddAsync(newDept);
-            await _context.SaveChangesAsync();
+            await _context.Departments.AddAsync(newDept).ConfigureAwait(false);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
-        return await DepartmentAsync(updateDept.Id);
+        return await DepartmentAsync(updateDept.Id).ConfigureAwait(false);
     }
 }
