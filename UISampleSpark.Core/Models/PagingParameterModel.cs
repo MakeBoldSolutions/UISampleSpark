@@ -27,7 +27,14 @@ public class PagingParameterModel
         };
     }
 
+    /// <summary>
+    /// 1-based page number. Defaults to 1.
+    /// </summary>
     public int? PageNumber { get; set; }
+
+    /// <summary>
+    /// Number of records per page. Capped at 5 000; defaults to 300.
+    /// </summary>
     public int? PageSize
     {
         get { return _pageSize; }

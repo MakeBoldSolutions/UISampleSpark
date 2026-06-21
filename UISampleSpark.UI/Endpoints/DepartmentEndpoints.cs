@@ -11,26 +11,31 @@ public static class DepartmentEndpoints
     {
         var group = app.MapGroup("api/department")
             .WithTags("Department")
-            .WithGroupName("Department API")
             .AddEndpointFilter<ApiKeyEndpointFilter>()
             .RequireRateLimiting("PerIpLimit");
 
         group.MapGet("", GetAllAsync)
             .WithName("ListDepartments")
-            .Produces<IEnumerable<DepartmentDto>>(StatusCodes.Status200OK);
+            .WithSummary("List departments")
+            .WithDescription("Returns all departments. Set `includeEmployees=true` to embed the full employee list in each department object.")
+            .Produces<IEnumerable<DepartmentDto>>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapGet("{id:int}", GetByIdAsync)
             .WithName("GetDepartment")
+            .WithSummary("Get department by ID")
+            .WithDescription("Returns the department matching the given numeric ID. Optionally includes the employee roster via query parameter.")
             .Produces<DepartmentDto>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return app;
     }
 
     private static async Task<IResult> GetAllAsync(
-        bool includeEmployees,
         IEmployeeService employeeService,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        [Microsoft.AspNetCore.Mvc.FromQuery] bool includeEmployees = false)
     {
         var departments = await employeeService.GetDepartmentsAsync(includeEmployees, cancellationToken).ConfigureAwait(false);
         return Results.Ok(departments);
