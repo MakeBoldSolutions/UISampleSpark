@@ -17,7 +17,6 @@ queries:
 paths:
   - UISampleSpark.CLI
   - UISampleSpark.Core
-  - UISampleSpark.Data
   - UISampleSpark.UI
   - UISampleSpark.MinimalApi
 
