@@ -8,8 +8,6 @@ using System.Threading.RateLimiting;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
 
 // Lightweight abuse protection: limit each client IP to 100 requests/minute.
 builder.Services.AddRateLimiter(options =>
@@ -81,7 +79,6 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Application-specific services
 builder.Services.AddScoped<IHttpRequestResultService, HttpRequestResultService>();
-builder.Services.AddScoped<ApiKeyAuthorizationFilter>();
 builder.Services.AddBootswatchThemeSwitcher();
 builder.Services.AddMarkdown();
 
@@ -191,8 +188,13 @@ app.UseSession();
 // Health check endpoint
 app.MapHealthChecks("/health");
 
-// Map controllers and pages
-app.MapControllers().RequireRateLimiting("PerIpLimit");
+// Map minimal API endpoints
+app.MapEmployeeApi();
+app.MapDepartmentApi();
+app.MapStatusApi();
+
+// Map view controllers and pages
+app.MapControllers();
 app.MapRazorPages();
 app.MapBlazorHub();
 

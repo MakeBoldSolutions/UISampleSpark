@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.3.11206.111
@@ -23,8 +24,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UISampleSpark.Core.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UISampleSpark.CLI", "UISampleSpark.CLI\UISampleSpark.CLI.csproj", "{4C736D18-1AE3-470A-A589-5BA8D644AF63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UISampleSpark.MinimalApi", "UISampleSpark.MinimalApi\UISampleSpark.MinimalApi.csproj", "{D7765D9A-FD01-C76B-404C-EC1A13266D4E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UISampleSpark.UI.Tests", "UISampleSpark.UI.Tests\UISampleSpark.UI.Tests.csproj", "{DAFA00C6-9441-4100-A95D-363B40BC7532}"
 EndProject
 Global
@@ -49,10 +48,6 @@ Global
 		{4C736D18-1AE3-470A-A589-5BA8D644AF63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C736D18-1AE3-470A-A589-5BA8D644AF63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C736D18-1AE3-470A-A589-5BA8D644AF63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7765D9A-FD01-C76B-404C-EC1A13266D4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7765D9A-FD01-C76B-404C-EC1A13266D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7765D9A-FD01-C76B-404C-EC1A13266D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7765D9A-FD01-C76B-404C-EC1A13266D4E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DAFA00C6-9441-4100-A95D-363B40BC7532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DAFA00C6-9441-4100-A95D-363B40BC7532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAFA00C6-9441-4100-A95D-363B40BC7532}.Release|Any CPU.ActiveCfg = Release|Any CPU

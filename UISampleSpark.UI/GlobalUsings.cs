@@ -4,6 +4,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
 global using UISampleSpark.Core.Interfaces;
 global using UISampleSpark.Core.Models;
+global using UISampleSpark.UI.Endpoints;
 global using UISampleSpark.UI.Extensions;
 global using UISampleSpark.Core.Helpers;
 global using UISampleSpark.UI.Helpers;
