@@ -27,6 +27,76 @@
         "security": [ ]
       }
     },
+    "/api-test-spark/remote-spec": {
+      "get": {
+        "tags": [
+          "UISampleSpark.UI"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/api-test-spark/remote-call": {
+      "get": {
+        "tags": [
+          "UISampleSpark.UI"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [ ]
+      },
+      "post": {
+        "tags": [
+          "UISampleSpark.UI"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [ ]
+      },
+      "put": {
+        "tags": [
+          "UISampleSpark.UI"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [ ]
+      },
+      "patch": {
+        "tags": [
+          "UISampleSpark.UI"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [ ]
+      },
+      "delete": {
+        "tags": [
+          "UISampleSpark.UI"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [ ]
+      }
+    },
     "/status": {
       "get": {
         "tags": [
