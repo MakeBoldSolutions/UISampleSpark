@@ -1,8 +1,8 @@
-# Pin the .NET 10 runtime/SDK (nightly until GA) so restore supports net10.0
+# Pin the .NET 10 runtime/SDK so restore supports net10.0
 ARG DOTNET_VERSION=10.0
 
-# Use the .NET 10 ASP.NET runtime as the base image (Alpine for security)
-FROM mcr.microsoft.com/dotnet/nightly/aspnet:${DOTNET_VERSION}-alpine AS base
+# Use the stable .NET 10 ASP.NET runtime as the base image (Alpine for security)
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-alpine AS base
 
 # Update Alpine packages to get latest security patches
 # Run multiple times to ensure all recursive dependencies are updated
@@ -29,8 +29,8 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 EXPOSE 8080
 
-# Use the .NET 10 SDK image for building the application
-FROM mcr.microsoft.com/dotnet/nightly/sdk:${DOTNET_VERSION} AS build
+# Use the stable .NET 10 SDK image for building the application
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
 WORKDIR /src
 
 # Set shell options for better error handling
@@ -83,8 +83,9 @@ WORKDIR "/src/UISampleSpark.UI"
 RUN dotnet build "UISampleSpark.UI.csproj" -c Release -o /app/build
 
 # Publish the application to the publish directory
+# --no-build: skip recompilation (already done in build stage above)
 FROM build AS publish
-RUN dotnet publish "UISampleSpark.UI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "UISampleSpark.UI.csproj" -c Release -o /app/publish /p:UseAppHost=false --no-build
 
 # Use the base image to run the application
 FROM base AS final
