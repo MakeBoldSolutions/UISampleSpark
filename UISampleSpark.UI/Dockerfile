@@ -80,7 +80,7 @@ COPY . .
 
 # Set the working directory to the web project and build the project in release mode
 WORKDIR "/src/UISampleSpark.UI"
-RUN dotnet build "UISampleSpark.UI.csproj" -c Release -o /app/build
+RUN dotnet build "UISampleSpark.UI.csproj" -c Release
 
 # Publish the application to the publish directory
 # --no-build: skip recompilation (already done in build stage above)
