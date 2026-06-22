@@ -20,7 +20,7 @@ RUN apk update && \
     # Second pass to catch any newly added dependencies
     apk upgrade --no-cache --available && \
     # Verify no vulnerabilities remain
-    apk audit --output json || true && \
+    apk audit || true && \
     # Remove unnecessary packages and clean up
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
@@ -67,11 +67,10 @@ COPY ["nuget.config", "./"]
 
 # Copy all project files - ensuring proper directory structure
 COPY ["UISampleSpark.UI/*.csproj", "UISampleSpark.UI/"]
-COPY ["UISampleSpark.Data/*.csproj", "UISampleSpark.Data/"]
 COPY ["UISampleSpark.Core/*.csproj", "UISampleSpark.Core/"]
 COPY ["UISampleSpark.CLI/*.csproj", "UISampleSpark.CLI/"]
 COPY ["UISampleSpark.Core.Tests/*.csproj", "UISampleSpark.Core.Tests/"]
-COPY ["UISampleSpark.Data.Tests/*.csproj", "UISampleSpark.Data.Tests/"]
+COPY ["UISampleSpark.UI.Tests/*.csproj", "UISampleSpark.UI.Tests/"]
 
 # Restore dependencies
 RUN dotnet restore "UISampleSpark.UI/UISampleSpark.UI.csproj"
