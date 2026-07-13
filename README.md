@@ -155,7 +155,7 @@ Implemented via Bootswatch services and `<bootswatch-theme-switcher />` integrat
 
 An evidence-based narrative of this repository's development history, contributor patterns,
 and architecture:
-[Repo Story (2026-06-21)](.documentation/repo-story/repo-story-2026-06-21.md)
+[Repo Story (2026-06-21)](.archive/2026-07-12/.documentation/repo-story/repo-story-2026-06-21.md)
 
 ---
 ## Contributing

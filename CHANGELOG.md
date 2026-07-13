@@ -19,12 +19,12 @@ tooling modernisation, Minimal API migration, and a new Vanilla JS employee CRUD
 #### Changed
 
 - **Data-Core Consolidation**: Merged `UISampleSpark.Data` project into `UISampleSpark.Core`,
-  reducing the solution from 5 to 4 projects (see [ADR-001](.documentation/decisions/ADR-001.md)).
+  reducing the solution from 5 to 4 projects (see [ADR-001](bold-docs/system/decisions/ADR-001.md)).
 - **OpenAPI Tooling**: Replaced `Swashbuckle.AspNetCore` with `Microsoft.AspNetCore.OpenApi`
   (built-in) and `ApiTestSpark` — eliminates CVE-flagged dependency
-  (see [ADR-002](.documentation/decisions/ADR-002.md)).
+  (see [ADR-002](bold-docs/system/decisions/ADR-002.md)).
 - **Minimal API Migration**: Replaced `[ApiController]` MVC controllers in `UISampleSpark.UI`
-  with Minimal API endpoint registrations (see [ADR-003](.documentation/decisions/ADR-003.md)).
+  with Minimal API endpoint registrations (see [ADR-003](bold-docs/system/decisions/ADR-003.md)).
 - **Paging Parameters**: Made nullable with sensible default fallbacks.
 - **API Documentation**: Enhanced endpoint descriptions and OpenAPI metadata.
 - **Code Refactoring**: Improved readability; resolved all `latest-all` analyzer warnings.

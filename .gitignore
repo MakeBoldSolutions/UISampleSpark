@@ -18,7 +18,6 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-!.documentation/releases/
 x64/
 x86/
 [Aa][Rr][Mm]/
@@ -359,12 +358,6 @@ TestResults/
 *.coverage
 *.coveragexml
 
-# AI-Assisted Development - Working Sessions (per Constitution Principle XI)
-# Session folders are temporary working directories that should not be committed
-.documentation/copilot/session-*/
-.documentation/copilot/drafts/*-draft.md
-.documentation/copilot/archive/*-temp.md
-
 # HTTP REST Client (VS Code, JetBrains)
 *.http.user
 .rest-client/
@@ -415,6 +408,5 @@ ehthumbs_vista.db
 ApplicationInsights.config
 nul
 
-# DevSpark - personal overrides (never commit)
-.documentation/*/commands/
+# Bold - installer backups (never commit)
 .bold/.backup/
