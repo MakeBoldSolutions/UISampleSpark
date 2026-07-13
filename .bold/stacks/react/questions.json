@@ -1,0 +1,4 @@
+[
+  {"id":"react.router","prompt":"Routing library?","type":"select","options":["tanstack","react-router"],"default":"react-router","when":"react","maps_to":"layer.react.router"},
+  {"id":"react.state","prompt":"State management?","type":"select","options":["context","zustand","redux"],"default":"context","when":"react","maps_to":"layer.react.state"}
+]

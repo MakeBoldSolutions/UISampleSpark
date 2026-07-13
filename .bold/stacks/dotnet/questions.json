@@ -1,0 +1,4 @@
+[
+  {"id":"dotnet.target_framework","prompt":"Target framework?","type":"text","default":"net9.0","when":"dotnet","maps_to":"layer.dotnet.target_framework"},
+  {"id":"dotnet.test_framework","prompt":"Test framework?","type":"select","options":["xunit","nunit"],"default":"xunit","when":"dotnet","maps_to":"layer.dotnet.test_framework"}
+]

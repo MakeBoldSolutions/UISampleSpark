@@ -1,0 +1,5 @@
+[
+  {"id":"api.style","prompt":"REST or GraphQL?","type":"select","options":["REST","GraphQL"],"default":"REST","maps_to":"core.api.style"},
+  {"id":"api.auth","prompt":"Authentication model?","type":"select","options":["none","api_key","oidc"],"default":"oidc","maps_to":"core.api.auth"},
+  {"id":"api.versioning","prompt":"API versioning scheme?","type":"select","options":["url_path","header","none"],"default":"url_path","maps_to":"core.api.versioning"}
+]

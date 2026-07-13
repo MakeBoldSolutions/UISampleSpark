@@ -1,0 +1,7 @@
+{
+  "name": "bold-webapp",
+  "version": "1.0.0",
+  "description": "Fullstack web app: .NET API + React frontend, Tailwind styling.",
+  "composition": { "starter": "fullstack", "stacks": ["dotnet", "react"], "flavors": ["tailwind"] },
+  "answer_defaults": { "react.router": "tanstack", "react.state": "zustand" }
+}

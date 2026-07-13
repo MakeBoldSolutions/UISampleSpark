@@ -1,3 +1,0 @@
-id: execute-plan
-description: Execute the implementation plan, open a PR, and review it
-target_workflow: execute-plan
