@@ -1,0 +1,30 @@
+{
+  "name": "UISampleSpark",
+  "mission": "Educational reference project demonstrating ASP.NET Core CRUD patterns across multiple UI technologies.",
+  "core": {
+    "language": { "value": "C#", "source": "discovered" },
+    "platform": { "value": ".NET 10", "source": "discovered" },
+    "solution": { "value": "UISampleSpark.sln", "source": "discovered" },
+    "multi_app": { "value": false, "source": "discovered" },
+    "auth": { "value": "none (educational scope, by design)", "source": "discovered" },
+    "test_framework": { "value": "MSTest", "source": "discovered" },
+    "coverage_goal_pct": { "value": 25, "source": "discovered" },
+    "containerization": { "value": "Docker, multi-stage, Alpine base, non-root", "source": "discovered" },
+    "ci": { "value": "GitHub Actions: Test & Build, Security Scanning (CodeQL + Trivy weekly), Docker Build & Push", "source": "discovered" }
+  },
+  "layer": {
+    "dotnet": {
+      "target_framework": { "value": "net10.0", "source": "discovered" },
+      "api_style": { "value": "mix of Minimal APIs and MVC controllers", "source": "discovered" },
+      "test_framework": { "value": "mstest", "source": "discovered" }
+    },
+    "ui": {
+      "frontends_demonstrated": { "value": ["MVC", "Razor Pages", "React", "Vue", "htmx", "Blazor"], "source": "discovered" }
+    }
+  },
+  "migration": {
+    "migrated_from": "devspark",
+    "migrated_from_version": "2.6.0",
+    "migrated_at": "2026-07-12"
+  }
+}

@@ -1,3 +1,0 @@
----
-agent: devspark.commit-audit
----

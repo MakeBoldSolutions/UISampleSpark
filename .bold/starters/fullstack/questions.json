@@ -1,0 +1,4 @@
+[
+  {"id":"fullstack.api_style","prompt":"REST or GraphQL for the API layer?","type":"select","options":["REST","GraphQL"],"default":"REST","maps_to":"core.api.style"},
+  {"id":"fullstack.auth","prompt":"Authentication model?","type":"select","options":["none","oidc"],"default":"oidc","maps_to":"core.api.auth"}
+]

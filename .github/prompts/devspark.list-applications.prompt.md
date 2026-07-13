@@ -1,3 +1,0 @@
----
-agent: devspark.list-applications
----

@@ -1,0 +1,1 @@
+{"name":"api","version":"1.0.0","description":"A standalone API service, no frontend.","compatible_stacks":["dotnet","node"]}

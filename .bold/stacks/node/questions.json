@@ -1,0 +1,4 @@
+[
+  {"id":"node.package_manager","prompt":"Package manager?","type":"select","options":["npm","pnpm","yarn"],"default":"npm","when":"node","maps_to":"layer.node.package_manager"},
+  {"id":"node.test_framework","prompt":"Test framework?","type":"select","options":["vitest","jest"],"default":"vitest","when":"node","maps_to":"layer.node.test_framework"}
+]

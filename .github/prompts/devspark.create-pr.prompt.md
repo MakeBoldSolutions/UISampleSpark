@@ -1,3 +1,0 @@
----
-agent: devspark.create-pr
----
