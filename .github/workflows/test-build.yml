@@ -108,7 +108,7 @@ jobs:
         with:
           name: coverage-report
           path: coveragereport
-          retention-days: 30
+          retention-days: 1
       
       - name: Comment PR with coverage
         if: github.event_name == 'pull_request'
