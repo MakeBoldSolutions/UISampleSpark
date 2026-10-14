@@ -16,6 +16,6 @@
   "devDependencies": {
     "bootstrap": "^5.3.8",
     "fs-extra": "^11.4.1",
-    "lucide-static": "1.48.0"
+    "lucide-static": "1.55.0"
   }
 }
