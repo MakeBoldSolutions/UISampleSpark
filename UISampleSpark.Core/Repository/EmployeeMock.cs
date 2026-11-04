@@ -11,7 +11,7 @@ namespace UISampleSpark.Core.Repository;
 /// <b>Note:</b> Data is regenerated on each instantiation and is not persisted.
 /// </para>
 /// </remarks>
-public class EmployeeMock : IEmployeeDB
+public class EmployeeMock
 {
     private readonly List<DepartmentDto> _departmentList = new();
     private readonly List<EmployeeDto> _employeeList = new();
