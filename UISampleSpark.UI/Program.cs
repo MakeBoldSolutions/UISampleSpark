@@ -1,7 +1,6 @@
 using ApiTestSpark;
 using Microsoft.OpenApi;
 using UISampleSpark.UI.Middleware;
-using WebSpark.HttpClientUtility.RequestResult;
 using Westwind.AspNetCore.Markdown;
 using System.Threading.RateLimiting;
 
@@ -167,16 +166,13 @@ using (var context = new UISampleSpark.Core.Models.Data.EmployeeContext())
     SeedDatabase.DatabaseInitialization(context);
 }
 
-// HTTP and infrastructure services
-builder.Services.AddHttpClient();
+// Infrastructure services
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Application-specific services
-builder.Services.AddScoped<IHttpRequestResultService, HttpRequestResultService>();
 builder.Services.AddMarkdown();
 
-// Session and MVC configuration
-builder.Services.AddSession();
+// MVC configuration
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute()));
@@ -275,7 +271,6 @@ app.Use(async (context, next) =>
 
 app.UseRateLimiter();
 app.UseAuthorization();
-app.UseSession();
 
 // Health check endpoint
 app.MapHealthChecks("/health");

@@ -75,15 +75,10 @@ See the [CHANGELOG](CHANGELOG.md) for the full milestone timeline, and open `rep
 - .NET 10 / C#
 - ASP.NET Core MVC & Razor Pages
 - React 18 (CDN + Babel standalone for in-browser JSX)
-- Entity Framework Core (InMemory & SqlServer packages referenced for future use)
-- Swashbuckle (Swagger/OpenAPI)
+- Entity Framework Core (InMemory provider; SQLite in the CLI sample)
+- Built-in ASP.NET Core OpenAPI + ApiTestSpark API explorer
 - Make Bold Spark theme (`wwwroot/css/makebold.css`) on Bootstrap 5.3; Be Vietnam Pro + Inter Tight self-hosted
-- WebSpark.HttpClientUtility
 - Markdown rendering (Westwind.AspNetCore.Markdown)
-
----
-## HttpClient Usage
-HttpClient is utilized via `WebSpark.HttpClientUtility` package which provides `IHttpRequestResultService` for making HTTP requests. The base `AddHttpClient()` factory registration is also available for future external API integrations.
 
 ---
 ## Getting Started
@@ -125,7 +120,7 @@ Employees belong to Departments. Each UI pattern implements the same operations 
 
 ---
 ## Swagger/OpenAPI
-Interactive API docs available at `/swagger` when running locally or deployed.
+Interactive API docs available at `/api-test-spark` (OpenAPI document at `/openapi/v1.json`) when running locally or deployed.
 
 ---
 ## API Access Keys

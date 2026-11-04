@@ -14,13 +14,9 @@ A .NET 10 ASP.NET Core application showcasing multiple CRUD UI strategies (MVC, 
 ## Tech Stack
 - .NET 10 / ASP.NET Core
 - Entity Framework Core (InMemory)
-- Swashbuckle (Swagger)
+- Built-in ASP.NET Core OpenAPI + ApiTestSpark
 - Make Bold Spark theme (`css/makebold.css`) on Bootstrap 5.3; brand fonts in `fonts/`
-- WebSpark.HttpClientUtility
 - Markdown rendering (Westwind)
-
-## HttpClient
-HttpClient is available via `WebSpark.HttpClientUtility`. Base `AddHttpClient()` is also registered for future external API use.
 
 ## Run Locally
 ```pwsh
