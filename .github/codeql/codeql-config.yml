@@ -18,7 +18,6 @@ paths:
   - UISampleSpark.CLI
   - UISampleSpark.Core
   - UISampleSpark.UI
-  - UISampleSpark.MinimalApi
 
 # Paths to exclude from analysis
 paths-ignore:
