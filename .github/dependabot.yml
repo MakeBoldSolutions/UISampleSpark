@@ -20,10 +20,21 @@ updates:
     open-pull-requests-limit: 5
     reviewers:
       - "markhazleton"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
-  # NuGet dependencies for main web project
+  # NuGet dependencies for all projects, in one entry so groups span projects.
+  # (Separate per-directory entries split matching bumps, e.g. SkiaSharp vs its
+  # native assets, or MSTest across both test projects, into failing PRs.)
   - package-ecosystem: "nuget"
-    directory: "/UISampleSpark.UI"
+    directories:
+      - "/UISampleSpark.UI"
+      - "/UISampleSpark.Core"
+      - "/UISampleSpark.CLI"
+      - "/UISampleSpark.Core.Tests"
+      - "/UISampleSpark.UI.Tests"
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -37,74 +48,26 @@ updates:
       include: "scope"
     open-pull-requests-limit: 10
     ignore:
-      # Ignore major version updates for Microsoft packages to avoid breaking changes
+      # Ignore major version updates for Microsoft packages to avoid breaking changes.
+      # This also covers Microsoft.OpenApi: ASP.NET Core 10 requires 2.x; revisit with a framework upgrade.
       - dependency-name: "Microsoft.*"
         update-types: ["version-update:semver-major"]
-
-  # NuGet dependencies for domain project
-  - package-ecosystem: "nuget"
-    directory: "/UISampleSpark.Core"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-      timezone: "America/New_York"
-    labels:
-      - "dependencies"
-      - "nuget"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-
-  # NuGet dependencies for console project
-  - package-ecosystem: "nuget"
-    directory: "/UISampleSpark.CLI"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-      timezone: "America/New_York"
-    labels:
-      - "dependencies"
-      - "nuget"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-
-  # NuGet dependencies for test projects
-  - package-ecosystem: "nuget"
-    directory: "/UISampleSpark.Core.Tests"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-      timezone: "America/New_York"
-    labels:
-      - "dependencies"
-      - "nuget"
-      - "tests"
-    commit-message:
-      prefix: "test"
-      include: "scope"
-
-  - package-ecosystem: "nuget"
-    directory: "/UISampleSpark.UI.Tests"
-    ignore:
-      # ASP.NET Core 10 requires Microsoft.OpenApi 2.x; revisit with a framework upgrade.
-      - dependency-name: "Microsoft.OpenApi"
-        update-types: ["version-update:semver-major"]
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-      timezone: "America/New_York"
-    labels:
-      - "dependencies"
-      - "nuget"
-      - "tests"
-    commit-message:
-      prefix: "test"
-      include: "scope"
+    groups:
+      # Packages that must move in lockstep, at every update type (incl. major).
+      # The first matching group wins, so these are listed before the catch-all.
+      skiasharp:
+        patterns:
+          - "SkiaSharp*"
+      mstest:
+        patterns:
+          - "MSTest*"
+      # Everything else: one PR per week for minor and patch updates.
+      nuget-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   # npm dependencies
   - package-ecosystem: "npm"
@@ -122,6 +85,17 @@ updates:
       include: "scope"
     open-pull-requests-limit: 10
     versioning-strategy: increase
+    groups:
+      # datatables.net and datatables.net-bs5 always release together.
+      datatables:
+        patterns:
+          - "datatables.net*"
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   # Docker base image updates
   - package-ecosystem: "docker"
