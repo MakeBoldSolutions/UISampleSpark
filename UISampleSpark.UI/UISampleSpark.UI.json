@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "UI Sample Spark API",
-    "description": "Employee management REST API for the UI Sample Spark educational project.\n\nDemonstrates ASP.NET Core minimal APIs alongside MVC, Razor Pages, Blazor,\nReact, Vue, and htmx — with per-IP rate limiting, API key authentication,\nand RFC 7807 ProblemDetails error responses.\n\n**Authentication:** All `/api/*` endpoints require an `X-API-Key` header.\nContact the site owner to obtain a valid key.",
+    "description": "Employee management REST API for the UI Sample Spark educational project.\r\n\r\nDemonstrates ASP.NET Core minimal APIs alongside MVC, Razor Pages, Blazor,\r\nReact, Vue, and htmx — with per-IP rate limiting, API key authentication,\r\nand RFC 7807 ProblemDetails error responses.\r\n\r\n**Authentication:** All `/api/*` endpoints require an `X-API-Key` header.\r\nContact the site owner to obtain a valid key.",
     "contact": {
       "name": "Mark Hazleton",
       "url": "https://markhazleton.com"
