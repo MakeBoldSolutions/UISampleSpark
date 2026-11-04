@@ -19,7 +19,7 @@ public class DepartmentDtoTests
         // Assert
         Assert.AreEqual("Department Id=2, Name=IT", mytest);
         Assert.AreEqual((int)dept, department.Id);
-        Assert.AreEqual(dept.GetDisplayName(), department.Name);
+        Assert.AreEqual(dept.ToString(), department.Name);
         Assert.AreEqual(dept.GetDescription(), department.Description);
     }
 
