@@ -358,6 +358,9 @@ TestResults/
 *.trx
 *.coverage
 *.coveragexml
+# ReportGenerator output (CI regenerates it; reports/git-spark-report.html stays tracked)
+/coveragereport/
+/reports/coverage/
 
 # AI-Assisted Development - Working Sessions (per Constitution Principle XI)
 # Session folders are temporary working directories that should not be committed
