@@ -9,13 +9,13 @@
   "dependencies": {
     "datatables.net": "^3.1.5",
     "datatables.net-bs5": "^3.1.5",
-    "jquery": "4.0.0",
+    "jquery": "4.1.0",
     "jquery-validation": "1.22.1",
     "jquery-validation-unobtrusive": "4.0.0"
   },
   "devDependencies": {
-    "bootstrap": "^5.3.8",
+    "bootstrap": "^5.3.9",
     "fs-extra": "^11.4.1",
-    "lucide-static": "1.68.0"
+    "lucide-static": "1.77.0"
   }
 }
